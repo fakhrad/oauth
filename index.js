@@ -1,5 +1,5 @@
-const authserver = require('./authserver');
-const model = require('./models/authmodel');
+const authserver = require('./src/authserver');
+const model = require('./src/models/authmodel');
 var mongoose = require('mongoose');
 console.log('OAuth service starting...')
 var init = function()
@@ -22,4 +22,4 @@ const oauth = new authserver({
   accessTokenLifetime: process.env.ACCESSTOKEN_LIFETIME || 4 * 60 * 60
 });
 console.log('Oauth service started.');
-module.exports = oauth;
+module.exports.oauth = oauth;

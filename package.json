@@ -1,10 +1,10 @@
 {
-  "name": "oauth",
-  "version": "1.0.1",
+  "name": "@app-sdk/oauth",
+  "version": "1.0.3",
   "description": "OAuth2 implementation of authentication service",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,6 +16,9 @@
     "authentiaction",
     "oauth2"
   ],
+  "publishConfig": {
+    "access" : "public"
+  },
   "author": "Fakhreddin Rezaei",
   "license": "ISC",
   "bugs": {
