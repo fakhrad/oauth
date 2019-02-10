@@ -1,2 +1,2 @@
 # oauth
-Oauth2 authentication service
+OAuth2 implementation of authentication service
