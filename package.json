@@ -1,6 +1,6 @@
 {
   "name": "@app-sdk/oauth",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "OAuth2 implementation of authentication service",
   "main": "index.js",
   "scripts": {
