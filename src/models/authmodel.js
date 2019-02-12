@@ -17,6 +17,7 @@ var OAuthUsersModel = mongoose.model('Users');
  */
 
 module.exports.getAccessToken = function(bearerToken) {
+  console.log('Get access token started')
   // Adding `.lean()`, as we get a mongoose wrapper object back from `findOne(...)`, and oauth2-server complains.
   return OAuthTokensModel.findOne({ accessToken: bearerToken }).lean();
 };
@@ -26,6 +27,8 @@ module.exports.getAccessToken = function(bearerToken) {
  */
 
 module.exports.getClient = function(clientId, clientSecret) {
+  console.log('Get client started : ' + clientId)
+
   return OAuthClientsModel.findOne({ clientId: clientId, clientSecret: clientSecret }).lean();
 };
 
