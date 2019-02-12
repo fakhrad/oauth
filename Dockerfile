@@ -1,4 +1,4 @@
-FROM node:alpine AS oauth
+FROM node:alpine AS authservice
 
 WORKDIR /app
 COPY . /app 
