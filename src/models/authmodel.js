@@ -37,6 +37,7 @@ module.exports.getClient = function(clientId, clientSecret) {
  */
 
 module.exports.getRefreshToken = function(refreshToken) {
+  console.log('Get refresh token started')
   return OAuthTokensModel.findOne({ refreshToken: refreshToken }).lean();
 };
 
@@ -45,6 +46,7 @@ module.exports.getRefreshToken = function(refreshToken) {
  */
 
 module.exports.getUser = function(username, password) {
+  console.log('Get user started')
   return OAuthUsersModel.findOne({ username: username, password: password }).lean();
 };
 

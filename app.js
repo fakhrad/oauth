@@ -10,7 +10,7 @@ var routes = require('./src/routes/oauth');
 var oauth = require('./src/config/init-auth')
 
 dbinit();
-console.log('Oauth service is up and running.');
+console.log('Authentication service started.');
 
 var app = express();
 app.oauth = oauth;
