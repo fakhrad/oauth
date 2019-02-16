@@ -1,7 +1,7 @@
 var User = require('../models/user'); 
 var jwt = require('jsonwebtoken');
 var async = require('async');
-const config = require('../config');
+const config = require('../config/config');
 
 var requestCode = function(req, cb)
 {
