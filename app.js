@@ -19,7 +19,6 @@ app.use(compression()); //Compress all routes
 app.use(helmet());
 app.use(cors());
 
-var cities = require('./src/routes/oauth');
 
 app.use(logger('dev'));
 app.use(bodyParser.json());

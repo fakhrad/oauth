@@ -4,15 +4,16 @@ const bcrypt = require('bcrypt-nodejs');
 const SALT_WORK_FACTOR = 10;
 
 var user = new Schema({
-    username : {type:String, unique : true, required : false},
-    password : {type:String, required : false, select : false},
-    email : {type : String, unique : true , require : false},
+    username : {type:String, required : true},
+    password : {type:String, required : true, select : false},
+    email : {type : String , require : false},
     twoFactorEnabled : {type : Boolean},
-    phoneNumber : {type:String, unique:true, required : false},
+    phoneNumber : {type:String, required : false},
     first_name : {type : String, max:100},
     last_name : {type : String, max:100},
     activation_code : {type:Number},
     avatar : {type:String},
+    age : {type : Number, min : 1, max : 200},
     city_code : {type:Number},
     address : {type : String},
     location : {type:Object},
