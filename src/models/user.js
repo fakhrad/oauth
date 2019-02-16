@@ -13,8 +13,9 @@ var user = new Schema({
     last_name : {type : String, max:100},
     activation_code : {type:Number},
     avatar : {type:String},
-    age : {type : Number, min : 1, max : 200},
-    city_code : {type:Number},
+    birth_date : {type : Date},
+    country : {type : Object},
+    city_code : {type:Object},
     address : {type : String},
     location : {type:Object},
     approved : {type : Boolean},
@@ -60,10 +61,3 @@ virtual('name').
 get(function(){
     return this.first_name + ' ' + this.last_name;
 });
-
-user.virtual('city', {
-    ref: 'City', // The model to use
-    localField: 'city_code', // Find people where `localField`
-    foreignField: 'cityCode', // is equal to `foreignField`
-    justOne: true
-  });

@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 require('./user');
 require('./client');
 require('./token');
+var jwt = require('jsonwebtoken');
 
 var OAuthTokensModel = mongoose.model('Tokens');
 var OAuthClientsModel = mongoose.model('Clients');
@@ -50,9 +51,27 @@ module.exports.getUser = function(username, password) {
   return OAuthUsersModel.findOne({ username: username, password: password }).lean();
 };
 
+
+module.exports.generateAccessToken = function(client, user, scope)
+{
+ var token = jwt.sign({ clientId : client._id, id: user._id, roles : user.roles, scope : scope }, config.secret, {
+   expiresIn: 86400 // expires in 24 hours
+ });
+ return token;
+}
+
+
+module.exports.generateRefreshToken = function(client, user, scope)
+{
+ var token = jwt.sign({ clientId : client._id, id: user._id }, config.secret, {
+   expiresIn: 30 * 24 * 60 * 60 // expires in 30 days
+ });
+ return token;
+}
 /**
  * Save token.
  */
+
 
 module.exports.saveToken = function(token, client, user) {
   var accessToken = new OAuthTokensModel({
