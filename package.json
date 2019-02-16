@@ -1,0 +1,36 @@
+{
+  "name": "@app-sdk/oauth",
+  "version": "1.0.5",
+  "description": "OAuth2 implementation of authentication service",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./src/bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fakhrad/oauth.git"
+  },
+  "keywords": [
+    "oauth",
+    "authentiaction",
+    "oauth2"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Fakhreddin Rezaei",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fakhrad/oauth/issues"
+  },
+  "homepage": "https://github.com/fakhrad/oauth#readme",
+  "dependencies": {
+    "amqplib": "0.5.3",
+    "bcrypt-nodejs": "0.0.3",
+    "jsonwebtoken": "8.4.0",
+    "mongoose": "5.4.10",
+    "oauth2-server": "3.0.1",
+    "var": "0.3.2"
+  }
+}
