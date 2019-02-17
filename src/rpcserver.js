@@ -51,6 +51,7 @@ function whenConnected() {
       //Login API
       ch.assertQueue("token", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
+              console.log('Token request recieved')
               var req = JSON.parse(msg.content.toString('utf8'));
               oauth.token(req.request, req.response, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
