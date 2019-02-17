@@ -23,12 +23,11 @@ var user = new Schema({
     rate : {type:Number},
     language : {type : String},
     notification : {type:Boolean},
-    token : {type:String},
+    access_token : {type:String},
     device : {type:String},
     lastlogin : {type : Date}
 }, { toJSON: { virtuals: true } });
 
-mongoose.model("Users", user);
 user.pre('save', function(next) {
     var sh = this;
     // only hash the password if it has been modified (or is new)
@@ -61,3 +60,4 @@ virtual('name').
 get(function(){
     return this.first_name + ' ' + this.last_name;
 });
+module.exports = mongoose.model("Users", user);
