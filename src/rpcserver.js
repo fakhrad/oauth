@@ -53,6 +53,7 @@ function whenConnected() {
           ch.consume(q.queue, function reply(msg) {
               console.log('Token request recieved')
               var req = JSON.parse(msg.content.toString('utf8'));
+              console.log(req);
               oauth.token(req.request, req.response, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
