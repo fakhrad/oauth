@@ -1,7 +1,17 @@
 var User = require('../models/user'); 
+var auth = require('../models/authmodel'); 
 var jwt = require('jsonwebtoken');
 var async = require('async');
 const config = require('../config/config');
+
+function getNewCode(phoneNumber)
+{
+    var min = 1000;
+    var max = 9999;
+    var code = Math.floor(Math.random() * (max - min)) + min;
+    //Sent code to the phone
+    return code;
+}
 
 var requestCode = function(req, cb)
 {
@@ -173,56 +183,84 @@ var changeUserCity = function(req, cb)
 
 var token = function(req, cb)
 {
-    User.findOne({'username' : req.body.email}).exec(function(err, user){
-        var result = {success : false, data : null, error : null };
-        if (err)
+    var result = {success : false, data : null, error : null, access_token : null };
+    auth.getClient(req.body.client_id, req.body.client_secret).exec(function(err, cl){
+        if (!cl)
         {
             result.success = false;
             result.data =  undefined;
-            result.error = err;
+            result.error = "Invalid client";
             cb(result);       
             return; 
         }
-        if (user)
+        if (cl)
         {
-            user.comparePassword(req.body.password, (err, isMatch)=>{
-                if (isMatch)
+            User.findOne({ username: req.body.username, password: req.body.password }).exec(function(err, user){
+                if (err)
                 {
-                    if (req.body.deviceToken)
-                    {
-                        user.device = req.body.deviceToken ? req.body.deviceToken : null;
-                    }
-                    if (user.twoFactorEnabled)
-                    {
-                        code = getNewCodeAndSend(req.body.phoneNumber);
-                        user.activation_code = code;
-                    }
-                    user.lastlogin = new Date();
-                    user.save(function(err){
-                        if(err)
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = "Invalid username or password.";
+                    cb(result);       
+                    return; 
+                }
+                if (user)
+                {
+                    user.comparePassword(req.body.password, (err, isMatch)=>{
+                        if (true)
+                        {
+                            var token = auth.generateAccessToken(cl, user);
+                            auth.saveToken(token, cl, user).then(()=>{
+                                if (req.body.deviceToken)
+                                {
+                                    user.device = req.body.deviceToken ? req.body.deviceToken : null;
+                                }
+                                if (user.twoFactorEnabled)
+                                {
+                                    code = getNewCode(req.body.phoneNumber);
+                                    user.activation_code = code;
+                                }
+                                user.lastlogin = new Date();
+                                user.save(function(err){
+                                    if(err)
+                                    {
+                                        result.success = false;
+                                        result.data =  undefined;
+                                        result.error = err;
+                                        cb(result);  
+                                        return;
+                                    }
+                                    //Successfull. 
+                                    //Publish user login request event
+                                    //console.log('new code ' + code)
+                                    result.success = true;
+                                    result.error = undefined;
+                                    user.access_token = token;
+                                    result.data =  user;
+                                    result.access_token = token;
+                                    cb(result); 
+                                });
+                            }).catch({
+                                
+                            });
+
+                        }
+                        else
                         {
                             result.success = false;
                             result.data =  undefined;
-                            result.error = err;
+                            result.error = "Invalid password";
                             cb(result);  
                             return;
                         }
-                        //Successfull. 
-                        //Publish user login request event
-                        //console.log('new code ' + code)
-                        result.success = true;
-                        result.error = undefined;
-                        result.data =  user;
-                        cb(result); 
                     });
                 }
                 else
                 {
                     result.success = false;
                     result.data =  undefined;
-                    result.error = "Invalid password";
-                    cb(result);  
-                    return;
+                    result.error = undefined;
+                    cb(result); 
                 }
             });
         }
@@ -230,10 +268,10 @@ var token = function(req, cb)
         {
             result.success = false;
             result.data =  undefined;
-            result.error = undefined;
+            result.error = "Client not found";
             cb(result); 
         }
-        
+
     });
 };
 

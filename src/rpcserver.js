@@ -54,7 +54,7 @@ function whenConnected() {
               console.log('Token request recieved')
               var req = JSON.parse(msg.content.toString('utf8'));
               console.log(req);
-              oauth.token({body : req.body, headers : {}, method : "POST", query : {}}, {}, (result)=>{
+              userController.token({body : req}, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });

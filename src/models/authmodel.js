@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 require('./user');
 require('./client');
 require('./token');
+var config = require('../config/config')
 var jwt = require('jsonwebtoken');
 
 var OAuthTokensModel = mongoose.model('Tokens');
@@ -54,10 +55,18 @@ module.exports.getUser = function(username, password) {
 
 module.exports.generateAccessToken = function(client, user, scope)
 {
- var token = jwt.sign({ clientId : client._id, id: user._id, roles : user.roles, scope : scope }, config.secret, {
-   expiresIn: 86400 // expires in 24 hours
- });
- return token;
+  var token;
+  if (user.twoFactorEnabled)
+    token = jwt.sign({ clientId : client._id, id: user._id, roles : user.roles, scope : scope, authenticated : false }, config.secret, {
+    expiresIn: 300 // expires in 5 minutes
+  });
+  else
+  {
+    token = jwt.sign({ clientId : client._id, id: user._id, roles : user.roles, scope : scope, authenticated : true }, config.secret, {
+      expiresIn: 86400 // expires in 24 hours
+    });
+  }
+  return token;
 }
 
 
