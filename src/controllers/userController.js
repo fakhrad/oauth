@@ -173,7 +173,7 @@ var changeUserCity = function(req, cb)
 
 var token = function(req, cb)
 {
-    User.findOne({'username' : req.body.email}).exec(function(err, user){
+    User.findOne({'username' : req.body.username}).exec(function(err, user){
         var result = {success : false, data : null, error : null };
         if (err)
         {
