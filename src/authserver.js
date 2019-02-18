@@ -37,24 +37,21 @@ function authserver(options) {
  * (See: https://tools.ietf.org/html/rfc6749#section-7)
  */
 
-authserver.prototype.authenticate = function(options) {
+authserver.prototype.authenticate = function(req, res, options) {
   var that = this;
-
-  return function(req, res, next) {
-    var request = new Request(req);
-    var response = new Response(res);
-    return Promise.bind(that)
-      .then(function() {
-        return this.server.authenticate(request, response, options);
-      })
-      .tap(function(token) {
-        res.locals.oauth = { token: token };
-        next();
-      })
-      .catch(function(e) {
-        return handleError.call(this, e, req, res, null, next);
-      });
-  };
+  var request = new Request(req);
+  var response = new Response(res);
+  return Promise.bind(that)
+    .then(function() {
+      return this.server.authenticate(request, response, options);
+    })
+    .tap(function(token) {
+      res.locals.oauth = { token: token };
+      next();
+    })
+    .catch(function(e) {
+      return handleError.call(this, e, req, res, null, next);
+    });
 };
 
 /**
@@ -65,30 +62,27 @@ authserver.prototype.authenticate = function(options) {
  * (See: https://tools.ietf.org/html/rfc6749#section-3.1)
  */
 
-authserver.prototype.authorize = function(options) {
+authserver.prototype.authorize = function(req, res, options) {
   var that = this;
+  var request = new Request(req);
+  var response = new Response(res);
 
-  return function(req, res, next) {
-    var request = new Request(req);
-    var response = new Response(res);
-
-    return Promise.bind(that)
-      .then(function() {
-        return this.server.authorize(request, response, options);
-      })
-      .tap(function(code) {
-        res.locals.oauth = { code: code };
-        if (this.continueMiddleware) {
-          next();
-        }
-      })
-      .then(function() {
-        return handleResponse.call(this, req, res, response);
-      })
-      .catch(function(e) {
-        return handleError.call(this, e, req, res, response, next);
-      });
-  };
+  return Promise.bind(that)
+    .then(function() {
+      return this.server.authorize(request, response, options);
+    })
+    .tap(function(code) {
+      res.locals.oauth = { code: code };
+      if (this.continueMiddleware) {
+        next();
+      }
+    })
+    .then(function() {
+      return handleResponse.call(this, req, res, response);
+    })
+    .catch(function(e) {
+      return handleError.call(this, e, req, res, response, next);
+    });
 };
 
 /**
@@ -99,45 +93,47 @@ authserver.prototype.authorize = function(options) {
  * (See: https://tools.ietf.org/html/rfc6749#section-3.2)
  */
 
-authserver.prototype.token = function(options) {
+authserver.prototype.token = function(req, res, options, callback) {
   var that = this;
+  var request = new Request(req);
+  var response = new Response(res);
 
-  return function(req, res, next) {
-    var request = new Request(req);
-    var response = new Response(res);
-
-    return Promise.bind(that)
-      .then(function() {
-        return this.server.token(request, response, options);
-      })
-      .tap(function(token) {
-        res.locals.oauth = { token: token };
-        if (this.continueMiddleware) {
-          next();
-        }
-      })
-      .then(function() {
-        return handleResponse.call(this, req, res, response);
-      })
-      .catch(function(e) {
-        return handleError.call(this, e, req, res, response, next);
-      });
-  };
+  return Promise.bind(that)
+    .then(function() {
+      return this.server.token(request, response, options);
+    })
+    .tap(function(token) {
+      res.locals = {};
+      res.locals.oauth = { token: token };
+      if (this.continueMiddleware) {
+        next();
+      }
+    })
+    .then(function() {
+      return handleResponse.call(this, req, res, response, callback);
+    })
+    .catch(function(e) {
+      return handleError.call(this, e, req, res, response, callback);
+    });
 };
 
 /**
  * Handle response.
  */
-var handleResponse = function(req, res, response) {
+var handleResponse = function(req, res, response, callback) {
 
+  var result = {success : false, data : null, error : null, access_token : null, refresh_token : null, token_type : null };
   if (response.status === 302) {
-    var location = response.headers.location;
-    delete response.headers.location;
-    res.set(response.headers);
-    res.redirect(location);
+    result.success = false;
+    result.data = response.body;
+    callback(result);
   } else {
-    res.set(response.headers);
-    res.status(response.status).send(response.body);
+    result.success = true;
+    result.data = response.body;
+    result.access_token = response.body.access_token;
+    result.refresh_token = response.body.refresh_token;
+    result.token_type = response.body.token;
+    callback(result);
   }
 };
 
@@ -145,19 +141,18 @@ var handleResponse = function(req, res, response) {
  * Handle error.
  */
 
-var handleError = function(e, req, res, response, next) {
+var handleError = function(e, req, res, response, callback) {
 
   if (this.useErrorHandler === true) {
-    next(e);
+    callback(e);
   } else {
     if (response) {
-      res.set(response.headers);
+      res.headers = (response.headers);
     }
 
-    res.status(e.code);
+    res.status = (e.code);
 
-
-    res.send({ error: e.name, error_description: e.message });
+    callback({ error: e.name, error_description: e.message });
   }
 };
 
