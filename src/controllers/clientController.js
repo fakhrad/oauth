@@ -84,7 +84,7 @@ var addClient = function(req, cb)
             return; 
         }
         //Successfull. 
-        //Publish shopper registered event
+        //Publish user registered event
         result.success = true;
         result.error = undefined;
         result.data =  client;
@@ -116,7 +116,7 @@ var deleteClient = function(req, cb)
                     return; 
                 }
                 //Successfull. 
-                //Publish shopper account deleted event
+                //Publish user account deleted event
                 result.success = true;
                 result.data =  {"message" : "Deleted successfully"};
                 result.error = undefined;
@@ -171,7 +171,7 @@ var updateClient = function(req, cb)
                     return; 
                 }
                 //Successfull. 
-                //Publish shopper profile updated event
+                //Publish user profile updated event
                 Client.findById(req.body.id).exec(function(err, client){
                     if(err)
                     {
