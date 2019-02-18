@@ -1,5 +1,6 @@
 var amqp = require('amqplib/callback_api');
 var db = require('./config/init-db');
+var cityController = require('./controllers/cityController');
 var userController = require('./controllers/userController');
 var cltController = require('./controllers/clientController')
 var oauth = require('./config/init-auth')
@@ -48,19 +49,43 @@ function whenConnected() {
 
         ch.prefetch(10);
         console.log('Authentication service broker started!');
-      //Login API
+      //Token API
       ch.assertQueue("token", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               console.log('Token request recieved')
               var req = JSON.parse(msg.content.toString('utf8'));
               console.log(req);
-              userController.token({body : req}, (result)=>{
+              oauth.token(req,  {}, {}, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
           });
       });
   
+       //Token API
+    ch.assertQueue("authenticate", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            console.log('Authenticate request recieved')
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log(req);
+            oauth.authenticate(req,  {}, {}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+     //Token API
+     ch.assertQueue("authorize", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            console.log('Authorize request recieved')
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log(req);
+            oauth.authorize(req,  {}, {}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
     ///AddUserByEmail Api
     ch.assertQueue("register", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
@@ -235,6 +260,17 @@ function whenConnected() {
             });
         });
       });
+
+      ///GetCities Api
+      ch.assertQueue("getcities", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            cityController.getcities({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
     });
   };
 start();
