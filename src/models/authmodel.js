@@ -69,14 +69,6 @@ module.exports.generateAccessToken = function(client, user, scope)
   return token;
 }
 
-
-module.exports.generateRefreshToken = function(client, user, scope)
-{
- var token = jwt.sign({ clientId : client._id, id: user._id }, config.secret, {
-   expiresIn: 30 * 24 * 60 * 60 // expires in 30 days
- });
- return token;
-}
 /**
  * Save token.
  */
