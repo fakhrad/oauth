@@ -1,5 +1,6 @@
 var amqp = require('amqplib/callback_api');
 var db = require('./config/init-db');
+var cityController = require('./controllers/cityController');
 var userController = require('./controllers/userController');
 var cltController = require('./controllers/clientController')
 var oauth = require('./config/init-auth')
@@ -259,6 +260,17 @@ function whenConnected() {
             });
         });
       });
+
+      ///GetCities Api
+      ch.assertQueue("getcities", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            cityController.getcities({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
     });
   };
 start();
