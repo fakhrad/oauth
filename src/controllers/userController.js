@@ -207,7 +207,7 @@ var token = function(req, cb)
                 if (user)
                 {
                     user.comparePassword(req.body.password, (err, isMatch)=>{
-                        if (true)
+                        if (isMatch)
                         {
                             var token = auth.generateAccessToken(cl, user);
                             auth.saveToken(token, cl, user).then(()=>{

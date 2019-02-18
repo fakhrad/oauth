@@ -1,4 +1,7 @@
 const Clients = require('../models/client');
+var uuid = require('uuid/v4')
+const bcrypt = require('bcrypt-nodejs');
+const SALT_WORK_FACTOR = 10;
 
 var findAll = function(req, cb)
 {
@@ -28,9 +31,9 @@ var findAll = function(req, cb)
         }
     });
 };
-var findById = function(req, cb)
+var findByUserId = function(req, cb)
 {
-    Clients.findById(req.body.id).exec(function(err, client){
+    Clients.find({"owner" : req.body.userId}).exec(function(err, client){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -59,9 +62,7 @@ var findById = function(req, cb)
 
 var addClient = function(req, cb)
 {
-    var client = new Client({
-        clientId: req.body.clientId,
-        clientSecret: req.body.clientSecret,
+    var client = new Clients({
         redirectUris: req.body.redirectUris,
         name : req.body.name,
         description : req.body.description,
@@ -73,28 +74,40 @@ var addClient = function(req, cb)
         owner : req.body.owner
     });
 
-    client.save(function(err){
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = err;
-            cb(result);       
-            return; 
-        }
-        //Successfull. 
-        //Publish user registered event
-        result.success = true;
-        result.error = undefined;
-        result.data =  client;
-        cb(result); 
+    client.clientId = uuid();
+    // only hash the password if it has been modified (or is new)
+    // generate a salt
+    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+        if (err) return;
+
+        // hash the password using our new salt
+        bcrypt.hash(client.clientId, salt, function(){}, function(err, hash) {
+            if (err) return ;
+            client.clientSecret = hash;
+            client.save(function(err){
+                var result = {success : false, data : null, error : null };
+                if (err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                //Successfull. 
+                //Publish user registered event
+                result.success = true;
+                result.error = undefined;
+                result.data =  client;
+                cb(result); 
+            });
+        });
     });
 };
 
 var deleteClient = function(req, cb)
 {
-     Client.findById(req.body.id).exec(function(err, client){
+     Clients.findById(req.body.id).exec(function(err, client){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -106,7 +119,7 @@ var deleteClient = function(req, cb)
         }
         if (client)
         {
-            Client.deleteOne(client, function(err){
+            Clients.deleteOne(client, function(err){
                 if(err)
                 {
                     result.success = false;
@@ -138,7 +151,7 @@ var deleteClient = function(req, cb)
 
 var updateClient = function(req, cb)
 {
-     Client.findById(req.body.id).exec(function(err, client){
+     Clients.findById(req.body.id).exec(function(err, client){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -201,7 +214,7 @@ var updateClient = function(req, cb)
 };
 
 exports.findAll = findAll;
-exports.findById = findById;
+exports.findByUserId = findByUserId;
 exports.addClient = addClient;
 exports.deleteClient = deleteClient;
 exports.updateClient = updateClient;

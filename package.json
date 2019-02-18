@@ -31,6 +31,7 @@
     "jsonwebtoken": "8.4.0",
     "mongoose": "5.4.10",
     "oauth2-server": "3.0.1",
+    "uuid": "3.3.2",
     "var": "0.3.2"
   }
 }
