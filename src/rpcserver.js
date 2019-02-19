@@ -86,12 +86,12 @@ function whenConnected() {
             });
         });
     });
-    ///AddUserByEmail Api
+    ///AddUser Api
     ch.assertQueue("register", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             console.log('register user started')
             var req = JSON.parse(msg.content.toString('utf8'));
-            userController.register({body : req}, (result)=>{
+            userController.registeruser({body : req}, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -221,7 +221,7 @@ function whenConnected() {
 
       ///Clients management apis
       //RegisterClient API
-      ch.assertQueue("registerclient", {durable: false}, (err, q)=>{
+      ch.assertQueue("registerapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.addClient({body : req}, (result)=>{
@@ -231,7 +231,7 @@ function whenConnected() {
         });
       });
       //RemoveClient API
-      ch.assertQueue("removeclient", {durable: false}, (err, q)=>{
+      ch.assertQueue("removeapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.deleteClient({body : req}, (result)=>{
@@ -241,7 +241,7 @@ function whenConnected() {
         });
       });
       //UpdateClient API
-      ch.assertQueue("updateclient", {durable: false}, (err, q)=>{
+      ch.assertQueue("updateapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.updateClient({body : req}, (result)=>{
@@ -251,7 +251,7 @@ function whenConnected() {
         });
       });
       //GetAllClients API
-      ch.assertQueue("getallclients", {durable: false}, (err, q)=>{
+      ch.assertQueue("getuserapps", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.findByUserId({body : req}, (result)=>{

@@ -27,6 +27,7 @@
   "homepage": "https://github.com/fakhrad/oauth#readme",
   "dependencies": {
     "amqplib": "0.5.3",
+    "async": "2.6.2",
     "bcrypt-nodejs": "0.0.3",
     "jsonwebtoken": "8.4.0",
     "mongoose": "5.4.10",

@@ -9,6 +9,9 @@ require('./client');
 require('./token');
 var config = require('../config/config')
 var jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt-nodejs');
+const async = require('async')
+const SALT_WORK_FACTOR = 10;
 
 var OAuthTokensModel = mongoose.model('Tokens');
 var OAuthClientsModel = mongoose.model('Clients');
@@ -47,10 +50,16 @@ module.exports.getRefreshToken = function(refreshToken) {
  * Get user.
  */
 
-module.exports.getUser = function(username, password) {
-  console.log('Get user started')
-  return OAuthUsersModel.findOne({ username: username, password: password }).lean();
-};
+module.exports.getUser = async function(clientId, username, password) {
+  console.log('Get user started');
+  var user = await OAuthUsersModel.findOne({clientId : clientId, username: username }).lean();
+  if (!user)
+    return undefined;
+  var b = bcrypt.compareSync(password, user.password);
+  if (b)
+    return user;
+  return undefined;
+}
 
 
 module.exports.generateAccessToken = function(client, user, scope)

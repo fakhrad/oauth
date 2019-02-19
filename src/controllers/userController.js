@@ -317,6 +317,7 @@ function getNewCode(phoneNumber)
 var registerUser = function(req, cb)
 {
     var sh = new User({
+        clientId : req.body.clientId,
         username : req.body.username,
         password : req.body.password,
         email : req.body.email,

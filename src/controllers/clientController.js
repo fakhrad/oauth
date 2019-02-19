@@ -163,8 +163,6 @@ var updateClient = function(req, cb)
         }
         if (client)
         {
-            client.clientId = req.body.clientId,
-            client.clientSecret = req.body.clientSecret,
             client.redirectUris = req.body.redirectUris,
             client.name = req.body.name,
             client.description = req.body.description,
@@ -185,7 +183,7 @@ var updateClient = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user profile updated event
-                Client.findById(req.body.id).exec(function(err, client){
+                Clients.findById(req.body.id).exec(function(err, client){
                     if(err)
                     {
                         result.success = false;
