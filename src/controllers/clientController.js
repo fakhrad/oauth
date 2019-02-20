@@ -171,7 +171,8 @@ var updateClient = function(req, cb)
             client.homepage = req.body.homepage,
             client.category = req.body.category,
             client.type = req.body.type,
-            client.owner = req.body.owner
+            client.owner = req.body.owner;
+            client.grants = ['password'];
             client.save(function(err){
                 if(err)
                 {
