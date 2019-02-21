@@ -10,8 +10,8 @@ var Schema = mongoose.Schema;
  * Schema definitions.
  */
 
-mongoose.model('Clients', new Schema({
-  clientId: { type: String, required : true, unique : true },
+ const client = new Schema({
+  clientId: { type: String, unique : true },
   clientSecret: { type: String },
   redirectUris: { type: Array },
   name : {type : String, required : true, max : 150, min : 3},
@@ -22,4 +22,6 @@ mongoose.model('Clients', new Schema({
   category : {type : String, required : true},
   type : {type : String, required : true, default : "native"},
   owner : {type : String, required : true}
-}));
+});
+
+module.exports = mongoose.model('Clients', client);

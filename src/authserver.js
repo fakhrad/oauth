@@ -4,10 +4,10 @@
  * Module dependencies.
  */
 
-var NodeOAuthServer = require('oauth2-server');
+var NodeOAuthServer = require('auth-core');
 var Promise = require('bluebird');
-var Request = require('oauth2-server').Request;
-var Response = require('oauth2-server').Response;
+var Request = require('auth-core').Request;
+var Response = require('auth-core').Response;
 
 /**
  * Constructor.
@@ -50,7 +50,7 @@ authserver.prototype.authenticate = function(req, res, options) {
       next();
     })
     .catch(function(e) {
-      return handleError.call(this, e, req, res, null, next);
+      return handleError.call(this, e, req, res, null);
     });
 };
 

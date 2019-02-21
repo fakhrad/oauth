@@ -5,8 +5,9 @@ const SALT_WORK_FACTOR = 10;
 
 var user = new Schema({
     username : {type:String, required : true},
-    password : {type:String, required : true, select : false},
+    password : {type:String, required : true},
     email : {type : String , require : false},
+    clientId : {type : String},
     twoFactorEnabled : {type : Boolean},
     phoneNumber : {type:String, required : false},
     first_name : {type : String, max:100},
@@ -55,6 +56,10 @@ user.methods.comparePassword = function(candidatePassword, cb) {
     });
 };
 
+
+user.methods.comparePasswordSync = function(candidatePassword) {
+    return bcrypt.compareSync(candidatePassword, this.password);
+};
 user.
 virtual('name').
 get(function(){
