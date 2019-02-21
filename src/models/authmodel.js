@@ -63,23 +63,11 @@ module.exports.getUser = async function(clientId, username, password) {
   return undefined;
 }
 
-function getNewCode(user)
-{
-    var min = 1000;
-    var max = 9999;
-    var code = Math.floor(Math.random() * (max - min)) + min;
-    //Sent code to the phone
-    OAuthUsersModel.findById(user).exec((err, usr)=>{
-      usr.activation_code = code;
-      usr.save();
-    });
-    return code;
-}
 
 module.exports.generateAccessToken = function(client, user, scope)
 {
   var token;
-  if (user.twoFactorEnabled)
+  if (user.twoFactorEnabled && !user.activation_code)
   {
       token = jwt.sign({ clientId : client._id, id: user._id, authenticated : false }, config.secret, {
       expiresIn: process.env.AUTHENTICATIONCODE_EXPIRE_TIME || 300 // expires in 5 minutes
@@ -102,19 +90,23 @@ module.exports.generateAccessToken = function(client, user, scope)
 module.exports.saveToken = function(token, client, user) {
   var accessToken = new OAuthTokensModel({
     accessToken: token.accessToken,
-    accessTokenExpiresOn: token.accessTokenExpiresOn,
+    accessTokenExpiresOn: token.accessTokenExpiresAt,
     client : client,
     clientId: client.clientId,
     refreshToken: token.refreshToken,
-    refreshTokenExpiresOn: token.refreshTokenExpiresOn,
+    accessTokenExpiresOn: token.refreshTokenExpiresAt,
     user : user,
     userId: user._id,
     twoFactorEnabled : user.twoFactorEnabled
   });
-  if (user.twoFactorEnabled)
+  if (token.activation_code)
   {
-    accessToken.authenticated = false;
-    accessToken.user.activation_code = getNewCode(accessToken.userId);
+    accessToken.activation_code = token.activation_code;
+    accessToken.authenticated = token.authenticated;
+  }
+  else
+  {
+    accessToken.authenticated = true;
   }
   // Can't just chain `lean()` to `save()` as we did with `findOne()` elsewhere. Instead we use `Promise` to resolve the data.
   return new Promise( function(resolve,reject){
@@ -133,7 +125,7 @@ module.exports.saveToken = function(token, client, user) {
     // /oauth-server/lib/models/token-model.js complains if missing `client` and `user`. Creating missing properties.
     data.client = data.clientId;
     if (saveResult.authenticated === false)
-      data.activation_code = saveResult.user.activation_code;
+      data.activation_code = saveResult.activation_code;
     data.user = data.userId;
 
     return data;
@@ -141,5 +133,53 @@ module.exports.saveToken = function(token, client, user) {
 };
 
 module.exports.saveAuthorizationCode = function(){
-  console.log('how is this implemented!?', arguments);
+  var accessToken = new OAuthTokensModel({
+    accessToken: token.accessToken,
+    accessTokenExpiresOn: token.accessTokenExpiresOn,
+    client : client,
+    clientId: client.clientId,
+    refreshToken: token.refreshToken,
+    refreshTokenExpiresOn: token.refreshTokenExpiresOn,
+    user : user,
+    userId: user._id,
+    twoFactorEnabled : user.twoFactorEnabled
+  });
+  if (user.twoFactorEnabled)
+  {
+    accessToken.authenticated = false;
+    accessToken.activation_code = getNewCode(accessToken.userId);
+  }
+  // Can't just chain `lean()` to `save()` as we did with `findOne()` elsewhere. Instead we use `Promise` to resolve the data.
+  return new Promise( function(resolve,reject){
+    accessToken.save(function(err,data){
+      if( err ) reject( err );
+      else resolve( data );
+    }) ;
+  }).then(function(saveResult){
+    // `saveResult` is mongoose wrapper object, not doc itself. Calling `toJSON()` returns the doc.
+    saveResult = saveResult && typeof saveResult == 'object' ? saveResult.toJSON() : saveResult;
+    
+    // Unsure what else points to `saveResult` in auth-core, making copy to be safe
+    var data = new Object();
+    for( var prop in saveResult ) data[prop] = saveResult[prop];
+    
+    // /oauth-server/lib/models/token-model.js complains if missing `client` and `user`. Creating missing properties.
+    data.client = data.clientId;
+    if (saveResult.authenticated === false)
+      data.activation_code = saveResult.activation_code;
+    data.user = data.userId;
+
+    return data;
+  });
 };
+
+module.exports.getAuthorizationCode = function(code){
+  console.log('auth code');
+  return OAuthTokensModel.findOne({ accessToken: code }).lean();
+}
+
+module.exports.revokeAuthorizationCode = function(code){
+  OAuthTokensModel.findOneAndRemove({ accessToken: code });
+  console.log('auth code revoked');
+  return code;
+}

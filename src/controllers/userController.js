@@ -3,6 +3,9 @@ var auth = require('../models/authmodel');
 var jwt = require('jsonwebtoken');
 var async = require('async');
 const config = require('../config/config');
+var mongoose = require('mongoose'); 
+require('../models/token');
+var OAuthTokensModel = mongoose.model('Tokens');
 
 function getNewCode(phoneNumber)
 {
@@ -56,7 +59,7 @@ var requestCode = function(req, cb)
 
 var verifycode = function(req, cb)
 {
-    User.findOne({'phoneNumber' : req.body.phoneNumber}).exec(function(err, user){
+    OAuthTokensModel.findOne({'access_token' : req.body.access_token}).exec(function(err, tkn){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -66,28 +69,11 @@ var verifycode = function(req, cb)
             cb(result);       
             return; 
         }
-        if (user && user.activation_code == req.body.code)
+        //اینجا بایذ توکن ساخته بشه و به کاربر ارسال بشه.
+        if (tkn && tkn.activation_code == req.body.code)
         {
-            var token = jwt.sign({ id: user._id, roles : user.roles }, config.secret, {
+            var token = jwt.sign({ id: user._id, roles : user.roles , authenticated : true}, config.secret, {
                 expiresIn: 86400 // expires in 24 hours
-            });
-            user.token = token;
-            user.activation_code = undefined;
-            user.save(function(err){
-                if(err)
-                {
-                    result.success = false;
-                    result.data =  undefined;
-                    result.error = err;
-                    cb(result);  
-                    return;
-                }
-                //Successfull. 
-                //Publish user logged in event
-                result.success = true;
-                result.error = undefined;
-                result.data =  user;
-                cb(result); 
             });
            
         }

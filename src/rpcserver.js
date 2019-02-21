@@ -58,10 +58,10 @@ function whenConnected() {
                 req.body.password = req.body.username;
               if (!req.body.grant_type)
                 req.body.grant_type = "password";
-              oauth.token(req,  {}, {}, (result)=>{
-                  ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                  ch.ack(msg);
-              });
+                oauth.token(req,  {}, {}, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
           });
       });
   

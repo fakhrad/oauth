@@ -19,5 +19,6 @@ mongoose.model('Tokens', new Schema({
   refreshTokenExpiresOn: { type: Date },
   user : { type: Object },
   userId: { type: String },
-  authenticated : {type : Boolean}
+  authenticated : {type : Boolean},
+  activation_code : {type : Number}
 }));
