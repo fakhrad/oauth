@@ -311,6 +311,6 @@ exports.token = token;
 exports.findbyemail = findByUserName;
 exports.registeruser = registerUser;
 exports.changeavatar = changeAvatar;
-exports.findById = findById;
+exports.findbyId = findById;
 exports.updateprofile = updateProfile;
 exports.deleteaccount = deleteaccount;
