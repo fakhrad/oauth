@@ -60,6 +60,34 @@ var findByUserId = function(req, cb)
     });
 };
 
+var findById = function(req, cb)
+{
+    Clients.find({"id" : req.body.id}).exec(function(err, client){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (client)
+        {
+            result.success = true;
+            result.error = undefined;
+            result.data =  client;
+            cb(result); 
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
 var addClient = function(req, cb)
 {
     var client = new Clients({
@@ -217,3 +245,4 @@ exports.findByUserId = findByUserId;
 exports.addClient = addClient;
 exports.deleteClient = deleteClient;
 exports.updateClient = updateClient;
+exports.findbyid = findById;

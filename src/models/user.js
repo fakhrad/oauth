@@ -7,7 +7,6 @@ var user = new Schema({
     username : {type:String, required : true},
     password : {type:String, required : true},
     email : {type : String , require : false},
-    clientId : {type : String},
     twoFactorEnabled : {type : Boolean},
     phoneNumber : {type:String, required : false},
     first_name : {type : String, max:100},
@@ -26,7 +25,9 @@ var user = new Schema({
     notification : {type:Boolean},
     access_token : {type:String},
     device : {type:String},
-    lastlogin : {type : Date}
+    lastlogin : {type : Date},
+    clientId : {type : String, required : true},
+    attrs : {type :Object}
 }, { toJSON: { virtuals: true } });
 
 user.pre('save', function(next) {

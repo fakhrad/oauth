@@ -268,6 +268,27 @@ function whenConnected() {
         });
       });
 
+            //GetAllClients API
+      ch.assertQueue("getuserapps", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            cltController.findByUserId({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+      });
+      //GetAllClients API
+      ch.assertQueue("getuserappbyid", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            cltController.findbyid({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+      });
+
       ///GetCities Api
       ch.assertQueue("getcities", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
