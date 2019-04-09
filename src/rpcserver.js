@@ -5,7 +5,7 @@ var userController = require('./controllers/userController');
 var cltController = require('./controllers/clientController')
 var oauth = require('./config/init-auth')
 
-var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
+var rabbitHost = process.env.RABBITMQ_HOST || "amqp://reqter:reqter@13.69.148.176:5672";
 
 var amqpConn = null;
 function start() {
