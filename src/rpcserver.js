@@ -2,7 +2,8 @@ var amqp = require('amqplib/callback_api');
 var db = require('./config/init-db');
 var cityController = require('./controllers/cityController');
 var userController = require('./controllers/userController');
-var cltController = require('./controllers/clientController')
+var cltController = require('./controllers/clientController');
+var adminController = require('./controllers/adminController');
 var oauth = require('./config/init-auth')
 
 var rabbitHost = process.env.RABBITMQ_HOST || "amqp://reqter:reqter@13.69.148.176:5672";
@@ -294,6 +295,24 @@ function whenConnected() {
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cityController.getcities({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    ch.assertQueue("adminregister", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            adminController.registeruser({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    ch.assertQueue("adminlogin", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            adminController.token({body : req}, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
