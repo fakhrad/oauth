@@ -235,7 +235,7 @@ var token = function(req, cb)
                         {
                             result.success = false;
                             result.data =  undefined;
-                            result.error = "Invalid password";
+                            result.error = "Invalid password provided";
                             cb(result);  
                             return;
                         }

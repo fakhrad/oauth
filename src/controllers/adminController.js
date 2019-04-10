@@ -35,8 +35,9 @@ var findById = function(req, cb)
 
 var token = function(req, cb)
 {
+    console.log(req);
     var result = {success : false, data : null, error : null, access_token : null };
-    User.findOne({ username: req.body.username, password: req.body.password }).exec(function(err, user){
+    User.findOne({ username: req.body.username }).exec(function(err, user){
         if (err)
         {
             result.success = false;
@@ -50,7 +51,9 @@ var token = function(req, cb)
             user.comparePassword(req.body.password, (err, isMatch)=>{
                 if (isMatch)
                 {
-                    var token = auth.generateAccessToken(cl, user);
+                    token = jwt.sign({ id: user._id }, config.secret, {
+                        expiresIn: process.env.AUTHENTICATIONTOKEN_EXPIRE_TIME || 30 * 24 * 60 * 60 // expires in 5 minutes
+                      });
                     user.lastlogin = new Date();
                     user.access_token = token;
                     user.save(function(err){

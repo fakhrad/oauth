@@ -313,6 +313,7 @@ function whenConnected() {
     ch.assertQueue("adminlogin", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
+            console.log(req);
             adminController.token({body : req}, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
