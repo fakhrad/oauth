@@ -124,6 +124,7 @@ var findByUserName = function(req, cb)
 
 var registerUser = function(req, cb)
 {
+    console.log(req);
     var user = new User({
         username : req.body.username,
         password : req.body.password,
