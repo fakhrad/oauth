@@ -6,7 +6,7 @@ var cltController = require('./controllers/clientController');
 var adminController = require('./controllers/adminController');
 var oauth = require('./config/init-auth')
 
-var rabbitHost = process.env.RABBITMQ_HOST || "amqp://reqter:reqter@13.69.148.176:5672";
+var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
 
 var amqpConn = null;
 function start() {
@@ -33,6 +33,9 @@ function start() {
   });
 }
 function whenConnected() {
+    setInterval(() => {
+        console.log("Worker still running.");
+      }, 1000);
     ///Users management channel
     amqpConn.createChannel( (err, ch) => {
         if (err) {
