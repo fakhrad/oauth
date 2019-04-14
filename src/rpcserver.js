@@ -33,9 +33,7 @@ function start() {
   });
 }
 function whenConnected() {
-    setInterval(() => {
-        console.log("Worker still running.");
-      }, 1000);
+
     ///Users management channel
     amqpConn.createChannel( (err, ch) => {
         if (err) {
