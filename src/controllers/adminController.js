@@ -127,17 +127,19 @@ var findByUserName = function(req, cb)
 
 var registerUser = function(req, cb)
 {
-    async.series(
-        {
-            user : function(callback) {callback},
-            email : function(callback) {callback},
-            app : function(callback) {callback},
-            space : function(callback) {callback},
-            contentTypes : function(callback) {callback}
-        }, (result)=>{
+    // async.series(
+    //     {
+    //         user : function(callback) {
+    //             callback();
+    //         },
+    //         email : function(callback) {callback},
+    //         app : function(callback) {callback},
+    //         space : function(callback) {callback},
+    //         contentTypes : function(callback) {callback}
+    //     }, (err, results)=>{
             
-        }
-    )
+    //     }
+    // )
 
     console.log(req);
     var user = new User({
