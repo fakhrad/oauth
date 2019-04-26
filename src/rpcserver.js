@@ -42,9 +42,11 @@ function whenConnected() {
         }
         ch.on("error", function(err) {
         console.error("[AMQP] channel error", err.message);
+        return setTimeout(this.startconnect, 1000);
         });
         ch.on("close", function() {
         console.log("[AMQP] channel closed");
+        return setTimeout(this.startconnect, 1000);
         });
         console.log('Client connected.');
         this.channel = ch;
@@ -305,7 +307,7 @@ function whenConnected() {
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
-            adminController.registeruser({body : req}, (result)=>{
+            adminController.registeruser(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -315,7 +317,17 @@ function whenConnected() {
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
-            adminController.token({body : req}, (result)=>{
+            adminController.token(req, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    ch.assertQueue("adminauthcode", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log(req);
+            adminController.authcode(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });

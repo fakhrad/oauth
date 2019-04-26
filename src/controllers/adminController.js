@@ -51,7 +51,7 @@ var token = function(req, cb)
             user.comparePassword(req.body.password, (err, isMatch)=>{
                 if (isMatch)
                 {
-                    token = jwt.sign({ id: user._id }, config.secret, {
+                    token = jwt.sign({ id: user._id}, config.secret, {
                         expiresIn: process.env.AUTHENTICATIONTOKEN_EXPIRE_TIME || 30 * 24 * 60 * 60 // expires in 5 minutes
                       });
                     user.lastlogin = new Date();
@@ -127,12 +127,27 @@ var findByUserName = function(req, cb)
 
 var registerUser = function(req, cb)
 {
+    async.series(
+        {
+            user : ()=>{},
+            email : ()=>{
+                
+            },
+            app : ()=>{},
+            space : ()=>{},
+            contentTypes : ()=>{}
+        }, (result)=>{
+            
+        }
+    )
+
     console.log(req);
     var user = new User({
         username : req.body.username,
         password : req.body.password,
         first_name : req.body.first_name ? req.body.first_name : null,
         last_name : req.body.last_name ? req.body.last_name : null,
+        account_type : req.body.account_type,
         avatar : req.body.avatar ? req.body.avatar : null,
         roles : ["admin"]
     });
@@ -149,6 +164,7 @@ var registerUser = function(req, cb)
         }
         //Successfull. 
         //Publish user registered event
+        user.password = undefined;
         result.success = true;
         result.error = undefined;
         result.data =  user;
@@ -309,6 +325,51 @@ var deleteaccount = function(req, cb)
     });
 };
 
+var authcode = function(req, cb)
+{
+    console.log(req);
+    var result = {success : false, data : null, error : null, access_token : null };
+    User.findOne({ username: req.body.username }).exec(function(err, user){
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = "Invalid username.";
+            cb(result);       
+            return; 
+        }
+        if (user)
+        {
+            token = jwt.sign({ id: user._id, clientId : user.clientId }, config.secret, {
+                expiresIn: process.env.AUTHENTICATIONTOKEN_EXPIRE_TIME || 30 * 24 * 60 * 60 // expires in 5 minutes
+              });
+            user.access_token = token;
+            user.save(function(err){
+                if(err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);  
+                    return;
+                }
+                //Successfull. 
+                result.success = true;
+                result.error = undefined;
+                result.data =  user;
+                result.access_token = token;
+                cb(result); 
+            });
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
 
 //Export functions
 exports.token = token;
@@ -318,3 +379,4 @@ exports.changeavatar = changeAvatar;
 exports.findbyId = findById;
 exports.updateprofile = updateProfile;
 exports.deleteaccount = deleteaccount;
+exports.authcode = this.authcode;

@@ -6,28 +6,28 @@ const SALT_WORK_FACTOR = 10;
 var user = new Schema({
     username : {type:String, required : true},
     password : {type:String, required : true},
-    email : {type : String , require : false},
+    email : {type : String , require : false},//profile
     twoFactorEnabled : {type : Boolean},
-    phoneNumber : {type:String, required : false},
-    first_name : {type : String, max:100},
-    last_name : {type : String, max:100},
+    phoneNumber : {type:String, required : false},//profile
+    first_name : {type : String, max:100},//profile
+    last_name : {type : String, max:100},//profile
     activation_code : {type:Number},
-    avatar : {type:String},
-    birth_date : {type : Date},
-    country : {type : Object},
-    city_code : {type:Object},
-    address : {type : String},
+    avatar : {type:String},//profile
+    birth_date : {type : Date},//profile
+    country : {type : Object},//profile
+    city_code : {type:Object},//profile
+    address : {type : String},//profile
     location : {type:Object},
     approved : {type : Boolean},
     roles : {type:Array},
-    rate : {type:Number},
+    rate : {type:Number},//profile
     language : {type : String},
     notification : {type:Boolean},
     access_token : {type:String},
     device : {type:String},
     lastlogin : {type : Date},
     clientId : {type : String, required : true},
-    attrs : {type :Object}
+    profile : {type :Object}
 }, { toJSON: { virtuals: true } });
 
 user.pre('save', function(next) {

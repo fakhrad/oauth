@@ -12,7 +12,8 @@ var user = new Schema({
     avatar : {type:String},
     lastlogin : {type : Date},
     access_token : {type : String},
-    active : {type : Boolean, default : true}
+    active : {type : Boolean, default : true},
+    account_type : {type:String, enum : ['free', 'advanced', 'premium'], default : "free"}
 }, { toJSON: { virtuals: true } });
 
 user.pre('save', function(next) {
