@@ -51,7 +51,7 @@ var token = function(req, cb)
             user.comparePassword(req.body.password, (err, isMatch)=>{
                 if (isMatch)
                 {
-                    token = jwt.sign({ id: user._id}, config.secret, {
+                    token = jwt.sign({ id: user._id, account_type : user.account_type}, config.secret, {
                         expiresIn: process.env.AUTHENTICATIONTOKEN_EXPIRE_TIME || 30 * 24 * 60 * 60 // expires in 5 minutes
                       });
                     user.lastlogin = new Date();
@@ -129,13 +129,11 @@ var registerUser = function(req, cb)
 {
     async.series(
         {
-            user : ()=>{},
-            email : ()=>{
-                
-            },
-            app : ()=>{},
-            space : ()=>{},
-            contentTypes : ()=>{}
+            user : function(callback) {callback},
+            email : function(callback) {callback},
+            app : function(callback) {callback},
+            space : function(callback) {callback},
+            contentTypes : function(callback) {callback}
         }, (result)=>{
             
         }
@@ -145,11 +143,13 @@ var registerUser = function(req, cb)
     var user = new User({
         username : req.body.username,
         password : req.body.password,
-        first_name : req.body.first_name ? req.body.first_name : null,
-        last_name : req.body.last_name ? req.body.last_name : null,
         account_type : req.body.account_type,
         avatar : req.body.avatar ? req.body.avatar : null,
-        roles : ["admin"]
+        roles : ["admin"],
+        profile : {
+            first_name : req.body.first_name ? req.body.first_name : null,
+            last_name : req.body.last_name ? req.body.last_name : null
+        }
     });
 
     user.save(function(err){
@@ -379,4 +379,4 @@ exports.changeavatar = changeAvatar;
 exports.findbyId = findById;
 exports.updateprofile = updateProfile;
 exports.deleteaccount = deleteaccount;
-exports.authcode = this.authcode;
+exports.authcode = authcode;

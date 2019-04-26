@@ -6,14 +6,13 @@ const SALT_WORK_FACTOR = 10;
 var user = new Schema({
     username : {type:String, required : true, unique : true},
     password : {type:String, required : true},
-    first_name : {type : String, max:100},
-    last_name : {type : String, max:100},
     roles : {type:Array},
     avatar : {type:String},
     lastlogin : {type : Date},
     access_token : {type : String},
     active : {type : Boolean, default : true},
-    account_type : {type:String, enum : ['free', 'advanced', 'premium'], default : "free"}
+    account_type : {type:String, enum : ['free', 'advanced', 'premium'], default : "free"},
+    profile : {type : Object}
 }, { toJSON: { virtuals: true } });
 
 user.pre('save', function(next) {

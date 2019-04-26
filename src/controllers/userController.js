@@ -129,7 +129,7 @@ var changeUserCity = function(req, cb)
         }
         if (user)
         {
-            user.city_code = req.body.citycode;
+            user.profile.city_code = req.body.citycode;
             user.save(function(err){
                 if(err)
                 {
@@ -137,7 +137,6 @@ var changeUserCity = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user city changed event
-                service.publish("usercitychanged", user);
                 User.findById(req.body.id).exec(function(err, user){
                     if(err)
                     {
@@ -310,13 +309,16 @@ var registerUser = function(req, cb)
         phoneNumber : req.body.phoneNumber,
         birth_date : req.body.birth_date,
         password : req.body.password,
-        first_name : req.body.first_name ? req.body.first_name : null,
-        last_name : req.body.last_name ? req.body.last_name : null,
         activation_code : getNewCode(req.body.phoneNumber),
         avatar : req.body.avatar ? req.body.avatar : null,
-        city_code : req.body.city_code ? req.body.city_code : null,
         roles : ["user"],
         device : req.body.deviceToken ? req.body.deviceToken : null,
+        profile : {
+            first_name : req.body.first_name ? req.body.first_name : null,
+            last_name : req.body.last_name ? req.body.last_name : null,
+            city_code : req.body.city_code ? req.body.city_code : null,
+            birth_date : req.body.birth_date,
+        }
     });
 
     sh.save(function(err){
@@ -567,9 +569,9 @@ var updateProfile = function(req, cb)
         }
         if (user)
         {
-            user.first_name = req.body.first_name;
-            user.last_name = req.body.last_name;
-            user.address = req.body.address;
+            user.profile.first_name = req.body.first_name;
+            user.profile.last_name = req.body.last_name;
+            user.profile.address = req.body.address;
             user.save(function(err){
                 if(err)
                 {
@@ -623,7 +625,7 @@ var locationchanged = function(req, cb)
         }
         if (user)
         {
-            user.location = req.body.location;
+            user.profile.location = req.body.location;
             user.save(function(err){
                 if(err)
                 {
