@@ -4,13 +4,14 @@ var cityController = require('./controllers/cityController');
 var userController = require('./controllers/userController');
 var cltController = require('./controllers/clientController');
 var adminController = require('./controllers/adminController');
+var spaceController = require('./controllers/spaceController');
 var oauth = require('./config/init-auth')
 
 var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
 
 var amqpConn = null;
 function start() {
-    console.log('Start connecting : ' + process.env.RABBITMQ_HOST );;
+    console.log('Start connecting : ' + rabbitHost );;
   amqp.connect(rabbitHost, (err, conn)=>{
     if (err) {
         console.error("[AMQP]", err.message);
@@ -328,6 +329,57 @@ function whenConnected() {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
             adminController.authcode(req, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    ///Spaces management api
+    //AddSpace API
+    ch.assertQueue("addspace", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            spaceController.addSpace({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    //Remove Space API
+    ch.assertQueue("removespace", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            spaceController.deleteSpace({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    //Update Space API
+    ch.assertQueue("updatespace", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            spaceController.updateSpace({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    //Get Space By Id API
+    ch.assertQueue("getspacebyid", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            spaceController.findbyid({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    //Get Space By User Id API
+    ch.assertQueue("getspacebyuserid", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            spaceController.findByUserId({body : req}, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });

@@ -1,4 +1,5 @@
 var User = require('../models/adminuser'); 
+var spaceCtrl = require('./spaceController');
 var jwt = require('jsonwebtoken');
 var async = require('async');
 const config = require('../config/config');
@@ -127,21 +128,6 @@ var findByUserName = function(req, cb)
 
 var registerUser = function(req, cb)
 {
-    // async.series(
-    //     {
-    //         user : function(callback) {
-    //             callback();
-    //         },
-    //         email : function(callback) {callback},
-    //         app : function(callback) {callback},
-    //         space : function(callback) {callback},
-    //         contentTypes : function(callback) {callback}
-    //     }, (err, results)=>{
-            
-    //     }
-    // )
-
-    console.log(req);
     var user = new User({
         username : req.body.username,
         password : req.body.password,
@@ -153,7 +139,6 @@ var registerUser = function(req, cb)
             last_name : req.body.last_name ? req.body.last_name : null
         }
     });
-
     user.save(function(err){
         var result = {success : false, data : null, error : null };
         if (err)
@@ -170,7 +155,23 @@ var registerUser = function(req, cb)
         result.success = true;
         result.error = undefined;
         result.data =  user;
-        cb(result); 
+        ///Create user first app
+        var space = {};
+        space.name = "Your Space Name";
+        space.owner = result.data._id;
+        space.type = result.data.account_type;
+        spaceCtrl.addSpace({body : space}, (err, data)=>{
+            var spres = {success : false, data : null, error : null };
+            if (err)
+            {
+                spres.success = false;
+                spres.data =  undefined;
+                spres.error = err;
+                cb(err, undefined);       
+                return; 
+            }
+            cb(undefined, result); 
+        });
     });
 };
 
