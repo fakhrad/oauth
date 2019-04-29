@@ -326,7 +326,7 @@ var deleteaccount = function(req, cb)
     });
 };
 
-var authcode = function(req, cb)
+var getforgotpasswordtoken = function(req, cb)
 {
     console.log(req);
     var result = {success : false, data : null, error : null, access_token : null };
@@ -342,7 +342,7 @@ var authcode = function(req, cb)
         if (user)
         {
             token = jwt.sign({ id: user._id, clientId : user.clientId }, config.secret, {
-                expiresIn: process.env.AUTHENTICATIONTOKEN_EXPIRE_TIME || 30 * 24 * 60 * 60 // expires in 5 minutes
+                expiresIn: process.env.AUTHENTICATIONTOKEN_EXPIRE_TIME || 24 * 60 * 60 // expires in 1 day
               });
             user.access_token = token;
             user.save(function(err){
@@ -380,4 +380,6 @@ exports.changeavatar = changeAvatar;
 exports.findbyId = findById;
 exports.updateprofile = updateProfile;
 exports.deleteaccount = deleteaccount;
-exports.authcode = authcode;
+// exports.getforgotpasswordtoken = getforgotpasswordtoken;
+// exports.changepassword = changepassword;
+// exports.resetpassword = resetpassword;

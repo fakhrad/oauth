@@ -324,11 +324,11 @@ function whenConnected() {
             });
         });
     });
-    ch.assertQueue("adminauthcode", {durable: false}, (err, q)=>{
+    ch.assertQueue("admingetforgotpasswordtoken", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
-            adminController.authcode(req, (result)=>{
+            adminController.getforgotpasswordtoken(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
