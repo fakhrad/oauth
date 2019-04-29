@@ -160,15 +160,17 @@ var registerUser = function(req, cb)
         space.name = "Your Space Name";
         space.owner = result.data._id;
         space.type = result.data.account_type;
-        spaceCtrl.addSpace({body : space}, (err, data)=>{
+        spaceCtrl.addSpace({body : space}, (err)=>{
             var spres = {success : false, data : null, error : null };
             if (err)
             {
                 spres.success = false;
                 spres.data =  undefined;
                 spres.error = err;
-                cb(err, undefined);       
-                return; 
+                User.findOneAndDelete({username : user.username}, ()=>{
+                    cb(err, undefined);       
+                    return; 
+                })
             }
             cb(undefined, result); 
         });

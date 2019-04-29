@@ -4,7 +4,7 @@
   "description": "OAuth2 implementation of authentication service",
   "main": "app.js",
   "scripts": {
-    "start": "node ./src/rpcserver.js",
+    "start": "node ./src/bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
