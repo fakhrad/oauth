@@ -164,11 +164,11 @@ var registerUser = function(req, cb)
             if (!spres.success)
             {
                 User.findOneAndDelete({username : user.username}, ()=>{
-                    cb(err, undefined);       
+                    cb(spres);       
                     return; 
                 })
             }
-            cb(undefined, result); 
+            cb(result); 
         });
     });
 };
