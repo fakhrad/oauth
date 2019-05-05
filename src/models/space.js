@@ -15,7 +15,9 @@ var Schema = mongoose.Schema;
   description : {type : String, max : 256},
   image : {type : Object},
   type : {type : String},
-  owner : {type: Schema.Types.ObjectId, ref: 'Systemuser' , required : true}
+  owner : {type: Schema.Types.ObjectId, ref: 'Systemuser' , required : true},
+  roles : [],
+  locales : []
 });
 
 module.exports = mongoose.model('Space', space);

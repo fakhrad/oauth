@@ -133,7 +133,7 @@ var registerUser = function(req, cb)
         password : req.body.password,
         account_type : req.body.account_type,
         avatar : req.body.avatar ? req.body.avatar : null,
-        roles : ["admin"],
+        roles : ["owner"],
         profile : {
             first_name : req.body.first_name ? req.body.first_name : null,
             last_name : req.body.last_name ? req.body.last_name : null
@@ -372,6 +372,103 @@ var getforgotpasswordtoken = function(req, cb)
     });
 };
 
+var resetpassword = function(req, cb)
+{
+    console.log(req);
+    var result = {success : false, data : null, error : null, access_token : null };
+    User.findById(req.body.id).exec(function(err, user){
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = "Invalid user.";
+            cb(result);       
+            return; 
+        }
+        if (user)
+        {
+            user.password = req.body.newpassword;
+            user.save(function(err){
+                if(err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);  
+                    return;
+                }
+                //Successfull. 
+                result.success = true;
+                result.error = undefined;
+                result.data =  user;
+                cb(result); 
+            });
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
+
+var changepassword = function(req, cb)
+{
+    console.log(req);
+    var result = {success : false, data : null, error : null, access_token : null };
+    User.findById(req.body.id).exec(function(err, user){
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = "Invalid user.";
+            cb(result);       
+            return; 
+        }
+        if (user)
+        {
+            user.comparePassword(req.body.oldpassword, (err, isMatch)=>{
+                if (isMatch)
+                {
+                    user.password = req.body.newpassword;
+                    user.save(function(err){
+                        if(err)
+                        {
+                            result.success = false;
+                            result.data =  undefined;
+                            result.error = err;
+                            cb(result);  
+                            return;
+                        }
+                        //Successfull. 
+                        result.success = true;
+                        result.error = undefined;
+                        result.data =  user;
+                        result.access_token = token;
+                        cb(result); 
+                    });
+                }
+                else
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = "Invalid old password.";
+                    cb(result); 
+                }
+            });
+            
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
 //Export functions
 exports.token = token;
 exports.findbyemail = findByUserName;
@@ -380,6 +477,6 @@ exports.changeavatar = changeAvatar;
 exports.findbyId = findById;
 exports.updateprofile = updateProfile;
 exports.deleteaccount = deleteaccount;
-// exports.getforgotpasswordtoken = getforgotpasswordtoken;
-// exports.changepassword = changepassword;
-// exports.resetpassword = resetpassword;
+exports.getforgotpasswordtoken = getforgotpasswordtoken;
+exports.changepassword = changepassword;
+exports.resetpassword = resetpassword;

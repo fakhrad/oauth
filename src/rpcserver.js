@@ -274,10 +274,10 @@ function whenConnected() {
       });
 
             //GetAllClients API
-      ch.assertQueue("getuserapps", {durable: false}, (err, q)=>{
+      ch.assertQueue("getspaceapps", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            cltController.findByUserId({body : req}, (result)=>{
+            cltController.findBySpaceId({body : req}, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -329,6 +329,26 @@ function whenConnected() {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
             adminController.getforgotpasswordtoken(req, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    ch.assertQueue("adminresetpassword", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log(req);
+            adminController.resetpassword(req, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    ch.assertQueue("adminchangepassword", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log(req);
+            adminController.changepassword(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });

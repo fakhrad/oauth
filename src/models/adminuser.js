@@ -42,7 +42,6 @@ user.methods.comparePassword = function(candidatePassword, cb) {
     });
 };
 
-
 user.methods.comparePasswordSync = function(candidatePassword) {
     return bcrypt.compareSync(candidatePassword, this.password);
 };

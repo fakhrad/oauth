@@ -60,6 +60,34 @@ var findByUserId = function(req, cb)
     });
 };
 
+var findByUSpaceId = function(req, cb)
+{
+    Clients.find({"spaceId" : req.body.spaceId}).exec(function(err, client){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (client)
+        {
+            result.success = true;
+            result.error = undefined;
+            result.data =  client;
+            cb(result); 
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
 var findById = function(req, cb)
 {
     Clients.find({"id" : req.body.id}).exec(function(err, client){
@@ -91,6 +119,7 @@ var findById = function(req, cb)
 var addClient = function(req, cb)
 {
     var client = new Clients({
+        spaceId : req.body.spaceId,
         redirectUris: req.body.redirectUris,
         name : req.body.name,
         description : req.body.description,
@@ -242,6 +271,7 @@ var updateClient = function(req, cb)
 
 exports.findAll = findAll;
 exports.findByUserId = findByUserId;
+exports.findBySpaceId = findByUSpaceId;
 exports.addClient = addClient;
 exports.deleteClient = deleteClient;
 exports.updateClient = updateClient;
