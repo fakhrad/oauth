@@ -148,11 +148,11 @@ var registerUser = function(req, cb)
         username : req.body.username,
         password : req.body.password,
         account_type : req.body.account_type,
-        avatar : req.body.avatar ? req.body.avatar : null,
         roles : ["owner"],
         profile : {
             first_name : req.body.first_name ? req.body.first_name : null,
-            last_name : req.body.last_name ? req.body.last_name : null
+            last_name : req.body.last_name ? req.body.last_name : null,
+            avatar : req.body.avatar ? req.body.avatar : null,
         }
     });
     user.save(function(err){
