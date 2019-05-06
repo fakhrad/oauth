@@ -7,7 +7,6 @@ var user = new Schema({
     username : {type:String, required : true, unique : true},
     password : {type:String, required : true},
     roles : {type:Array},
-    avatar : {type:String},
     lastlogin : {type : Date},
     access_token : {type : String},
     active : {type : Boolean, default : true},

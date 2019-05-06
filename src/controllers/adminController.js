@@ -29,7 +29,10 @@ var findById = function(req, cb)
                     result.success = true;
                     result.error = undefined;
                     var output = results.user.viewModel();
-                    output.spaces = results.spaces;
+                    output.spaces = [];
+                    results.spaces.forEach(space => {
+                        output.spaces.push(space.viewModel());
+                    });
                     result.data = output;
                     cb(result);
                     return;
@@ -200,7 +203,7 @@ var changeAvatar = function(req, cb)
         }
         if (user)
         {
-            user.avatar = req.body.avatar.filename;
+            user.profile.avatar = req.body.avatar.filename;
             user.save(function(err){
                 if(err)
                 {

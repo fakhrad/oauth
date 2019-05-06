@@ -20,4 +20,12 @@ var Schema = mongoose.Schema;
   locales : []
 });
 
+space.methods.viewModel = function(cb) {
+  return {
+      id : this._id,
+      roles : this.roles,
+      locales : this.locales,
+      name : this.name
+  }
+};
 module.exports = mongoose.model('Space', space);
