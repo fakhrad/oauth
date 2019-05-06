@@ -46,4 +46,16 @@ user.methods.comparePasswordSync = function(candidatePassword) {
     return bcrypt.compareSync(candidatePassword, this.password);
 };
 
+user.methods.viewModel = function(cb) {
+    return {
+        username : this.username,
+    roles : this.roles,
+    avatar : this.avatar,
+    lastlogin : this.lastlogin,
+    active : this.active,
+    account_type : this.account_type,
+    profile : this.profile
+    }
+};
+
 module.exports = mongoose.model("AdminUsers", user);

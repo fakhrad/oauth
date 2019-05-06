@@ -1,4 +1,5 @@
 var User = require('../models/adminuser'); 
+var Space = require('../models/space'); 
 var spaceCtrl = require('./spaceController');
 var jwt = require('jsonwebtoken');
 var async = require('async');
@@ -7,31 +8,43 @@ var mongoose = require('mongoose');
 
 var findById = function(req, cb)
 {
-    User.findById(req.body.id).exec(function(err, user){
-        var result = {success : false, data : null, error : null };
-        if (err)
+    async.parallel(
         {
-            result.success = false;
-            result.data =  undefined;
-            result.error = err;
-            cb(result);       
-            return; 
+            "user" : function(callback) {User.findById(req.body.id).exec(callback)},
+            "spaces" : function(callback) {Space.find({owner : req.body.id}).exec(callback)}
+        }, (err, results)=>{
+            var result = {success : false, data : null, error : null };
+            if (err)
+            {
+                result.success = false;
+                result.data =  undefined;
+                result.error = err;
+                cb(result);       
+                return; 
+            }
+            else
+            {
+                if (results.user)
+                {
+                    result.success = true;
+                    result.error = undefined;
+                    var output = results.user.viewModel();
+                    output.spaces = results.spaces;
+                    result.data = output;
+                    cb(result);
+                    return;
+                }
+                else
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = "User not found";
+                    cb(result);       
+                    return; 
+                }
+            }
         }
-        if (user)
-        {
-            result.success = true;
-            result.error = undefined;
-            result.data =  user;
-            cb(result); 
-        }
-        else
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = undefined;
-            cb(result); 
-        }
-    });
+    )
 };
 
 var token = function(req, cb)
