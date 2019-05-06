@@ -57,4 +57,12 @@ user.methods.viewModel = function(cb) {
     }
 };
 
+user.methods.confirmEmail = function(cb) {
+    this.emailConfirmed = true;
+    this.save((err)=>{
+        if (cb)
+            cb(err);
+    });
+    
+};
 module.exports = mongoose.model("AdminUsers", user);

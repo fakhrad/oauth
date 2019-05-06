@@ -430,6 +430,46 @@ var resetpassword = function(req, cb)
     });
 };
 
+var confirmEmail = function(req, cb)
+{
+    var result = {success : false, data : null, error : null, access_token : null };
+    User.findById(req.userId).exec(function(err, user){
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = "Invalid user.";
+            cb(result);       
+            return; 
+        }
+        if (user)
+        {
+            user.confirmEmail((err)=>{
+                if (err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                result.success = true;
+                result.data =  user;
+                result.error = undefined;
+                cb(result);       
+                return; 
+            });
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
+
 var changepassword = function(req, cb)
 {
     console.log(req);
@@ -496,3 +536,4 @@ exports.deleteaccount = deleteaccount;
 exports.getforgotpasswordtoken = getforgotpasswordtoken;
 exports.changepassword = changepassword;
 exports.resetpassword = resetpassword;
+exports.confirmemail = confirmEmail;
