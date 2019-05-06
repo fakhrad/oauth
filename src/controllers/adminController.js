@@ -433,7 +433,7 @@ var resetpassword = function(req, cb)
 var confirmEmail = function(req, cb)
 {
     var result = {success : false, data : null, error : null, access_token : null };
-    User.findById(req.userId).exec(function(err, user){
+    User.findById(req.body.id).exec(function(err, user){
         if (err)
         {
             result.success = false;
@@ -444,7 +444,8 @@ var confirmEmail = function(req, cb)
         }
         if (user)
         {
-            user.confirmEmail((err)=>{
+         console.log("confirming email");
+         user.confirmEmail((err)=>{
                 if (err)
                 {
                     result.success = false;
@@ -454,7 +455,7 @@ var confirmEmail = function(req, cb)
                     return; 
                 }
                 result.success = true;
-                result.data =  user;
+                result.data =  user.viewModel();
                 result.error = undefined;
                 cb(result);       
                 return; 

@@ -10,6 +10,7 @@ var user = new Schema({
     lastlogin : {type : Date},
     access_token : {type : String},
     active : {type : Boolean, default : true},
+    emailConfirmed : {type : Boolean, default : false},
     account_type : {type:String, enum : ['free', 'advanced', 'premium'], default : "free"},
     profile : {type : Object}
 }, { toJSON: { virtuals: true } });
@@ -49,7 +50,7 @@ user.methods.viewModel = function(cb) {
     return {
         username : this.username,
     roles : this.roles,
-    avatar : this.avatar,
+    emailConfirmed : this.emailConfirmed,
     lastlogin : this.lastlogin,
     active : this.active,
     account_type : this.account_type,
