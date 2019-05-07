@@ -245,7 +245,7 @@ var changeAvatar = function(req, cb)
 
 var updateProfile = function(req, cb)
 {
-     User.findById(req.body.id).exec(function(err, user){
+     User.findById(req.userId).exec(function(err, user){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -257,8 +257,12 @@ var updateProfile = function(req, cb)
         }
         if (user)
         {
-            user.first_name = req.body.first_name;
-            user.last_name = req.body.last_name;
+            if (user.profile === undefined)
+                user.profile = {};
+            var p = {};
+            p.first_name = req.body.first_name;
+            p.last_name = req.body.last_name;
+            user.profile = p;
             user.save(function(err){
                 if(err)
                 {
@@ -270,7 +274,7 @@ var updateProfile = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user profile updated event
-                User.findById(req.body.id).exec(function(err, user){
+                User.findById(req.userId).exec(function(err, user){
                     if(err)
                     {
                         result.success = false;
@@ -281,7 +285,7 @@ var updateProfile = function(req, cb)
                     }
                     result.success = true;
                     result.error = undefined;
-                    result.data =  user;
+                    result.data =  user.viewModel();
                     cb(result); 
                 });
             });
