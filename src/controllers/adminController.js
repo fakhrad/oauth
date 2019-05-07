@@ -420,7 +420,7 @@ var resetpassword = function(req, cb)
                 //Successfull. 
                 result.success = true;
                 result.error = undefined;
-                result.data =  user;
+                result.data =  user.viewModel();
                 cb(result); 
             });
         }
@@ -506,8 +506,7 @@ var changepassword = function(req, cb)
                         //Successfull. 
                         result.success = true;
                         result.error = undefined;
-                        result.data =  user;
-                        result.access_token = token;
+                        result.data =  user.viewModel();
                         cb(result); 
                     });
                 }
