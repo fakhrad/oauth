@@ -203,7 +203,14 @@ var changeAvatar = function(req, cb)
         }
         if (user)
         {
-            user.profile.avatar = req.body.avatar.filename;
+            if (user.profile === undefined)
+                user.profile = {};
+            var p = {};
+            p.avatar = req.body.avatar;
+            p.first_name = user.profile.first_name;
+            p.last_name = user.profile.last_name;
+
+            user.profile = p;
             user.save(function(err){
                 if(err)
                 {
@@ -226,7 +233,7 @@ var changeAvatar = function(req, cb)
                     }
                     result.success = true;
                     result.error = undefined;
-                    result.data =  user;
+                    result.data =  user.viewModel();
                     cb(result); 
                 });
             });
@@ -260,8 +267,10 @@ var updateProfile = function(req, cb)
             if (user.profile === undefined)
                 user.profile = {};
             var p = {};
+            p.avatar = user.profile.avatar;
             p.first_name = req.body.first_name;
             p.last_name = req.body.last_name;
+
             user.profile = p;
             user.save(function(err){
                 if(err)
