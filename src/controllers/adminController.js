@@ -65,6 +65,14 @@ var token = function(req, cb)
         }
         if (user)
         {
+            if (!user.confirmEmail)
+            {
+                result.success = false;
+                result.data =  undefined;
+                result.error = "Your email not confirmed yet. Please continue from the link in your email.";
+                cb(result);  
+                return;
+            }
             user.comparePassword(req.body.password, (err, isMatch)=>{
                 if (isMatch)
                 {
