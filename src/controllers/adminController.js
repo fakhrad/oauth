@@ -65,7 +65,7 @@ var token = function(req, cb)
         }
         if (user)
         {
-            if (!user.confirmEmail)
+            if (!user.emailConfirmed)
             {
                 result.success = false;
                 result.data =  undefined;
