@@ -279,7 +279,6 @@ var changeNotification = function(req, cb)
             p.avatar = user.profile.avatar;
             p.first_name = user.profile.first_name;
             p.last_name = user.profile.last_name;
-
             user.profile = p;
             user.save(function(err){
                 if(err)

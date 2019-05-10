@@ -348,7 +348,8 @@ function whenConnected() {
     ch.assertQueue("adminchangenotification", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.changenotification({body : req}, (result)=>{
+            console.log(req);
+            adminController.changenotification(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
