@@ -170,6 +170,16 @@ function whenConnected() {
               });
           }); 
       });
+      ///ChangeNotification Api
+      ch.assertQueue("adminchangenotification", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            userController.changenotification({body : req}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
       ///ChangeAvatar Api
       ch.assertQueue("changeavatar", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {

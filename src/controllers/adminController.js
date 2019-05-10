@@ -250,6 +250,68 @@ var changeAvatar = function(req, cb)
     });
 };
 
+var changeNotification = function(req, cb)
+{
+     User.findById(req.body.id).exec(function(err, user){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (user)
+        {
+            if (user.profile === undefined)
+                user.profile = {};
+            var p = {};
+            p.notification = req.body.notification;
+            p.avatar = user.profile.avatar;
+            p.first_name = user.profile.first_name;
+            p.last_name = user.profile.last_name;
+
+            user.profile = p;
+            user.save(function(err){
+                if(err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                //Successfull. 
+                //Publish user avatar changed event
+                User.findById(req.body.id).exec(function(err, user){
+                    if(err)
+                    {
+                        result.success = false;
+                        result.data =  undefined;
+                        result.error = err;
+                        cb(result);       
+                        return; 
+                    }
+                    result.success = true;
+                    result.error = undefined;
+                    result.data =  user.viewModel();
+                    cb(result); 
+                });
+            });
+            return;
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result);       
+            return; 
+        }
+    });
+};
+
 var updateProfile = function(req, cb)
 {
      User.findById(req.userId).exec(function(err, user){
@@ -267,6 +329,7 @@ var updateProfile = function(req, cb)
             if (user.profile === undefined)
                 user.profile = {};
             var p = {};
+            p.notification = user.profile.notification;
             p.avatar = user.profile.avatar;
             p.first_name = req.body.first_name;
             p.last_name = req.body.last_name;
@@ -543,6 +606,7 @@ exports.token = token;
 exports.findbyemail = findByUserName;
 exports.registeruser = registerUser;
 exports.changeavatar = changeAvatar;
+exports.changenotification = changeNotification;
 exports.findbyId = findById;
 exports.updateprofile = updateProfile;
 exports.deleteaccount = deleteaccount;
