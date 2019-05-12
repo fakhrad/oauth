@@ -103,7 +103,7 @@ function whenConnected() {
                 req.username = req.phoneNumber;
             if (!req.password)
                 req.password = req.phoneNumber;
-            userController.registeruser({body : req}, (result)=>{
+            userController.registeruser(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -113,7 +113,7 @@ function whenConnected() {
       ch.assertQueue("verifycode", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.verifycode({body : req}, (result)=>{
+              userController.verifycode(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -124,7 +124,7 @@ function whenConnected() {
       ch.assertQueue("findbyid", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.findById({body : req}, (result)=>{
+              userController.findById(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -134,7 +134,7 @@ function whenConnected() {
      ch.assertQueue("findbyphone", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.findbyphone({body : req}, (result)=>{
+              userController.findbyphone(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -144,7 +144,7 @@ function whenConnected() {
       ch.assertQueue("changecity", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.changecity({body : req}, (result)=>{
+              userController.changecity(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -154,7 +154,7 @@ function whenConnected() {
       ch.assertQueue("requestcode", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.requestcode({body : req}, (result)=>{
+              userController.requestcode(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -164,7 +164,7 @@ function whenConnected() {
       ch.assertQueue("changenumber", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.changenumber({body : req}, (result)=>{
+              userController.changenumber(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -174,7 +174,7 @@ function whenConnected() {
       ch.assertQueue("changeavatar", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.changeavatar({body : req}, (result)=>{
+              userController.changeavatar(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -184,7 +184,7 @@ function whenConnected() {
       ch.assertQueue("changelanguage", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.changelanguage({body : req}, (result)=>{
+              userController.changelanguage(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -194,7 +194,7 @@ function whenConnected() {
       ch.assertQueue("changenotification", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.changenotification({body : req}, (result)=>{
+              userController.changenotification(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -204,7 +204,7 @@ function whenConnected() {
       ch.assertQueue("updateprofile", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.updateprofile({body : req}, (result)=>{
+              userController.updateprofile(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -214,7 +214,7 @@ function whenConnected() {
       ch.assertQueue("deleteaccount", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.deleteaccount({body : req}, (result)=>{
+              userController.deleteaccount(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -224,7 +224,7 @@ function whenConnected() {
       ch.assertQueue("locationchanged", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              userController.locationchanged({body : req}, (result)=>{
+              userController.locationchanged(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -236,7 +236,7 @@ function whenConnected() {
       ch.assertQueue("registerapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            cltController.addClient({body : req}, (result)=>{
+            cltController.addClient(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -246,7 +246,7 @@ function whenConnected() {
       ch.assertQueue("removeapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            cltController.deleteClient({body : req}, (result)=>{
+            cltController.deleteClient(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -256,7 +256,7 @@ function whenConnected() {
       ch.assertQueue("updateapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            cltController.updateClient({body : req}, (result)=>{
+            cltController.updateClient(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -266,7 +266,7 @@ function whenConnected() {
       ch.assertQueue("getuserapps", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            cltController.findByUserId({body : req}, (result)=>{
+            cltController.findByUserId(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -277,7 +277,7 @@ function whenConnected() {
       ch.assertQueue("getspaceapps", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            cltController.findBySpaceId({body : req}, (result)=>{
+            cltController.findBySpaceId(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -287,7 +287,7 @@ function whenConnected() {
       ch.assertQueue("getuserappbyid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            cltController.findbyid({body : req}, (result)=>{
+            cltController.findbyid(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -298,7 +298,7 @@ function whenConnected() {
       ch.assertQueue("getcities", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            cityController.getcities({body : req}, (result)=>{
+            cityController.getcities(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -406,7 +406,7 @@ function whenConnected() {
     ch.assertQueue("addspace", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.addSpace({body : req}, (result)=>{
+            spaceController.addSpace(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -416,7 +416,7 @@ function whenConnected() {
     ch.assertQueue("removespace", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.deleteSpace({body : req}, (result)=>{
+            spaceController.deleteSpace(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -426,7 +426,7 @@ function whenConnected() {
     ch.assertQueue("updatespace", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.updateSpace({body : req}, (result)=>{
+            spaceController.updateSpace(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -436,7 +436,7 @@ function whenConnected() {
     ch.assertQueue("getspacebyid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.findbyid({body : req}, (result)=>{
+            spaceController.findbyid(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -446,7 +446,17 @@ function whenConnected() {
     ch.assertQueue("getspacebyuserid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.findByUserId({body : req}, (result)=>{
+            spaceController.findByUserId(req, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+        });
+    });
+    //Set Space Locales
+    ch.assertQueue("setspacelocales", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            spaceController.setLocales(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
