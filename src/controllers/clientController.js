@@ -3,9 +3,9 @@ var uuid = require('uuid/v4')
 const bcrypt = require('bcrypt-nodejs');
 const SALT_WORK_FACTOR = 10;
 
-var findAll = function(req, cb)
+var findByUSpaceId = function(req, cb)
 {
-    Clients.find().exec(function(err, clients){
+    Clients.find({"sys.paceId" : req.spaceId}).exec(function(err, clients){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -20,63 +20,6 @@ var findAll = function(req, cb)
             result.success = true;
             result.error = undefined;
             result.data =  clients;
-            cb(result); 
-        }
-        else
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = undefined;
-            cb(result); 
-        }
-    });
-};
-var findByUserId = function(req, cb)
-{
-    Clients.find({"owner" : req.body.userId}).exec(function(err, client){
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = err;
-            cb(result);       
-            return; 
-        }
-        if (client)
-        {
-            result.success = true;
-            result.error = undefined;
-            result.data =  client;
-            cb(result); 
-        }
-        else
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = undefined;
-            cb(result); 
-        }
-    });
-};
-
-var findByUSpaceId = function(req, cb)
-{
-    Clients.find({"spaceId" : req.body.spaceId}).exec(function(err, client){
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = err;
-            cb(result);       
-            return; 
-        }
-        if (client)
-        {
-            result.success = true;
-            result.error = undefined;
-            result.data =  client;
             cb(result); 
         }
         else
@@ -119,7 +62,7 @@ var findById = function(req, cb)
 var addClient = function(req, cb)
 {
     var client = new Clients({
-        spaceId : req.body.spaceId,
+        spaceId : req.spaceId,
         redirectUris: req.body.redirectUris,
         name : req.body.name,
         description : req.body.description,
@@ -176,7 +119,7 @@ var deleteClient = function(req, cb)
         }
         if (client)
         {
-            Clients.deleteOne(client, function(err){
+            Clients.remove({_id : client._id}, function(err){
                 if(err)
                 {
                     result.success = false;
@@ -229,7 +172,7 @@ var updateClient = function(req, cb)
             client.category = req.body.category,
             client.type = req.body.type,
             client.owner = req.body.owner;
-            client.grants = ['password'];
+            client.grants = req.body.grants;
             client.save(function(err){
                 if(err)
                 {
@@ -269,8 +212,6 @@ var updateClient = function(req, cb)
     });
 };
 
-exports.findAll = findAll;
-exports.findByUserId = findByUserId;
 exports.findBySpaceId = findByUSpaceId;
 exports.addClient = addClient;
 exports.deleteClient = deleteClient;

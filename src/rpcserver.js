@@ -236,6 +236,7 @@ function whenConnected() {
       ch.assertQueue("registerapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
+            console.log(req);
             cltController.addClient(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
@@ -262,19 +263,9 @@ function whenConnected() {
             });
         });
       });
-      //GetAllClients API
-      ch.assertQueue("getuserapps", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            cltController.findByUserId(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
-      });
 
-            //GetAllClients API
-      ch.assertQueue("getspaceapps", {durable: false}, (err, q)=>{
+     //GetAllClients API
+      ch.assertQueue("getapps", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.findBySpaceId(req, (result)=>{
@@ -284,7 +275,7 @@ function whenConnected() {
         });
       });
       //GetAllClients API
-      ch.assertQueue("getuserappbyid", {durable: false}, (err, q)=>{
+      ch.assertQueue("getappbyid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.findbyid(req, (result)=>{
