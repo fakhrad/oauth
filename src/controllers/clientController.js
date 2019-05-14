@@ -71,7 +71,7 @@ var addClient = function(req, cb)
         homepage : req.body.homepage,
         category : req.body.category,
         type : req.body.type,
-        owner : req.body.owner
+        owner : req.userId
     });
 
     client.clientId = uuid();
