@@ -5,7 +5,7 @@ const SALT_WORK_FACTOR = 10;
 
 var findByUSpaceId = function(req, cb)
 {
-    Clients.find({"sys.paceId" : req.spaceId}).exec(function(err, clients){
+    Clients.find({"spaceId" : req.spaceId}).exec(function(err, clients){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -45,6 +45,14 @@ var findById = function(req, cb)
         }
         if (client)
         {
+            if (client.owner !== req.userId)
+            {
+                result.success = false;
+                result.data =  {"message" : "Invalid access"};
+                result.error = undefined;
+                cb(result);       
+                return; 
+            }
             result.success = true;
             result.error = undefined;
             result.data =  client;
@@ -119,6 +127,14 @@ var deleteClient = function(req, cb)
         }
         if (client)
         {
+            if (client.owner !== req.userId)
+            {
+                result.success = false;
+                result.data =  {"message" : "Invalid access"};
+                result.error = undefined;
+                cb(result);       
+                return; 
+            }
             Clients.remove({_id : client._id}, function(err){
                 if(err)
                 {
@@ -163,6 +179,14 @@ var updateClient = function(req, cb)
         }
         if (client)
         {
+            if (client.owner !== req.userId)
+            {
+                result.success = false;
+                result.data =  {"message" : "Invalid access"};
+                result.error = undefined;
+                cb(result);       
+                return; 
+            }
             client.redirectUris = req.body.redirectUris,
             client.name = req.body.name,
             client.description = req.body.description,

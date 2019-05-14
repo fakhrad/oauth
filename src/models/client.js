@@ -18,12 +18,12 @@ var Schema = mongoose.Schema;
     name : {type : String, required : true, max : 150, min : 3, unique : true},
     description : {type : String, max : 256},
     longDesc : {type : String},
-    icon : {type : String, default : "cogs"},
+    icon : {type : String},
     homepage : {type : String},
-    category : {type : String, required : true},
+    category : {type : String, required : false},
     type : {type : String, required : true, default : "native"},
     grants : [String],
-    owner : {type: Schema.Types.ObjectId, ref: 'Systemuser' , required : true}
+    owner : {type: String, required : true}
 });
 
 module.exports = mongoose.model('Clients', client);
