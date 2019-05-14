@@ -5,6 +5,7 @@ const SALT_WORK_FACTOR = 10;
 
 var findByUSpaceId = function(req, cb)
 {
+    console.log(req);
     Clients.find({"spaceId" : req.spaceId}).exec(function(err, clients){
         var result = {success : false, data : null, error : null };
         if (err)
@@ -79,7 +80,8 @@ var addClient = function(req, cb)
         homepage : req.body.homepage,
         category : req.body.category,
         type : req.body.type,
-        owner : req.userId
+        owner : req.userId,
+        grants : req.body.grants
     });
 
     client.clientId = uuid();
