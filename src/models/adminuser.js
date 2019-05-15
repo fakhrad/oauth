@@ -48,6 +48,7 @@ user.methods.comparePasswordSync = function(candidatePassword) {
 
 user.methods.viewModel = function(cb) {
     return {
+        id : this._id,
         username : this.username,
     roles : this.roles,
     emailConfirmed : this.emailConfirmed,
