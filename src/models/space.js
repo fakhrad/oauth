@@ -17,7 +17,8 @@ var Schema = mongoose.Schema;
   type : {type : String},
   owner : {type: Schema.Types.ObjectId, ref: 'Systemuser' , required : true},
   roles : [],
-  locales : []
+  locales : [],
+  webhooks : []
 });
 
 space.methods.viewModel = function(cb) {

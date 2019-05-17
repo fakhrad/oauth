@@ -383,6 +383,7 @@ var updateProfile = function(req, cb)
 
 var deleteaccount = function(req, cb)
 {
+    console.log(req);
      User.findById(req.body.id).exec(function(err, user){
         var result = {success : false, data : null, error : null };
         if (err)
@@ -395,7 +396,7 @@ var deleteaccount = function(req, cb)
         }
         if (user)
         {
-            User.deleteOne(user, function(err){
+            User.remove({"_id" : user._id}, function(err){
                 if(err)
                 {
                     result.success = false;
@@ -405,14 +406,13 @@ var deleteaccount = function(req, cb)
                     return; 
                 }
                 //Successfull. 
-                //Publish user account deleted event
+                //Publish user account deleted event and remove all storages
                 result.success = true;
                 result.data =  {"message" : "Deleted successfully"};
                 result.error = undefined;
                 cb(result);       
                 return; 
             });
-            return;
         }
         else
         {

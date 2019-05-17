@@ -247,7 +247,7 @@ var setLocales = function(req, cb)
     });
 };
 
-var setApiKeys = function(req, cb)
+var setWebhooks = function(req, cb)
 {
      Space.findById(req.body.id).exec(function(err, space){
         console.log(space)
@@ -262,7 +262,7 @@ var setApiKeys = function(req, cb)
         }
         if (space)
         {
-            space.keys = req.body.keys,
+            space.webhooks = req.body.webhooks,
             space.save(function(err){
                 if(err)
                 {
@@ -272,7 +272,6 @@ var setApiKeys = function(req, cb)
                     cb(result);       
                     return; 
                 }
-                console.log("return to user")
                 //Successfull. 
                 //Publish user profile updated event
                 Space.findById(req.body.id).exec(function(err, space){
@@ -302,10 +301,44 @@ var setApiKeys = function(req, cb)
         }
     });
 };
+
+var getWebhooks = function(req, cb)
+{
+    Space.findById(req.body.id  ).exec(function(err, space){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (space)
+        {
+            result.success = true;
+            result.error = undefined;
+            console.log(space);
+            if (space.webhooks)
+                result.data =  space.webhooks;
+            else
+                result.data = [];
+            cb(result); 
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
 exports.findByUserId = findByUserId;
 exports.addSpace = addSpace;
 exports.deleteSpace = deleteSpace;
 exports.updateSpace = updateSpace;
 exports.findbyid = findById;
 exports.setLocales = setLocales;
-exports.setKeys = setApiKeys;
+exports.setWebhooks = setWebhooks;
+exports.getWebhooks = getWebhooks;
