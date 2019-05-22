@@ -5,6 +5,8 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var Tokens = require('./token');
+var Users = require('./user');
 
 /**
  * Schema definitions.
@@ -26,4 +28,9 @@ var Schema = mongoose.Schema;
     owner : {type: String, required : true}
 });
 
+client.pre('remove', function(next) {
+    console.log('Removing Client');
+    Tokens.remove({clientId : this.id}).exec();
+    Users.remove({clientId : this.id}).exec();
+  });
 module.exports = mongoose.model('Clients', client);

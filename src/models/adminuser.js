@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 const bcrypt = require('bcrypt-nodejs');
 const SALT_WORK_FACTOR = 10;
+var Spaces = require('./space');
 
 var user = new Schema({
     username : {type:String, required : true, unique : true},
@@ -33,6 +34,11 @@ user.pre('save', function(next) {
             next();
         });
     });
+});
+
+user.pre('remove', function(next) {
+    console.log('Removing Admin User');
+    Spaces.remove({owner : this.id}).exec();
 });
 
 user.methods.comparePassword = function(candidatePassword, cb) {

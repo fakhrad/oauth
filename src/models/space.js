@@ -5,7 +5,7 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-
+var Clients = require('./client');
 /**
  * Schema definitions.
  */
@@ -19,6 +19,11 @@ var Schema = mongoose.Schema;
   roles : [],
   locales : [],
   webhooks : []
+});
+
+space.pre('remove', function(next) {
+  console.log('Removing Space');
+  Clients.remove({spaceId : this.id}).exec();
 });
 
 space.methods.viewModel = function(cb) {
