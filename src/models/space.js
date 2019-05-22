@@ -21,7 +21,7 @@ var Clients = require('./client');
   webhooks : []
 });
 
-space.pre('remove', function(next) {
+space.post('remove', function(next) {
   console.log('Removing Space');
   Clients.remove({spaceId : this.id}).exec();
 });

@@ -28,7 +28,7 @@ var Users = require('./user');
     owner : {type: String, required : true}
 });
 
-client.pre('remove', function(next) {
+client.post('remove', function(next) {
     console.log('Removing Client');
     Tokens.remove({clientId : this.id}).exec();
     Users.remove({clientId : this.id}).exec();
