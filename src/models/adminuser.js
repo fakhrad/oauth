@@ -36,8 +36,8 @@ user.pre('save', function(next) {
     });
 });
 
-user.post('remove', function(next) {
-    console.log('Removing Admin User');
+user.post('delete', function(next) {
+    console.log('Removing Space');
     Spaces.deleteOne({owner : this.id}).exec();
 });
 

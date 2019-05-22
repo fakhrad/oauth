@@ -28,8 +28,8 @@ var Users = require('./user');
     owner : {type: String, required : true}
 });
 
-client.post('remove', function(next) {
-    console.log('Removing Client');
+client.post('delete', function(next) {
+    console.log('Removing Tokens and Users');
     Tokens.deleteMany({clientId : this.id}).exec();
     Users.deleteMany({clientId : this.id}).exec();
   });
