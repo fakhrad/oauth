@@ -23,7 +23,7 @@ var Clients = require('./client');
 
 space.post('remove', function(next) {
   console.log('Removing Space');
-  Clients.remove({spaceId : this.id}).exec();
+  Clients.deleteOne({spaceId : this.id}).exec();
 });
 
 space.methods.viewModel = function(cb) {

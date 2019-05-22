@@ -30,7 +30,7 @@ var Users = require('./user');
 
 client.post('remove', function(next) {
     console.log('Removing Client');
-    Tokens.remove({clientId : this.id}).exec();
-    Users.remove({clientId : this.id}).exec();
+    Tokens.deleteMany({clientId : this.id}).exec();
+    Users.deleteMany({clientId : this.id}).exec();
   });
 module.exports = mongoose.model('Clients', client);

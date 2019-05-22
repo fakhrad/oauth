@@ -38,7 +38,7 @@ user.pre('save', function(next) {
 
 user.post('remove', function(next) {
     console.log('Removing Admin User');
-    Spaces.remove({owner : this.id}).exec();
+    Spaces.deleteOne({owner : this.id}).exec();
 });
 
 user.methods.comparePassword = function(candidatePassword, cb) {
