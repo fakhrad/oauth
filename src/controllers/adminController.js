@@ -396,7 +396,7 @@ var deleteaccount = function(req, cb)
         }
         if (user)
         {
-            User.remove({"_id" : user._id}, function(err){
+            User.deleteOne({"_id" : user._id}, function(err){
                 if(err)
                 {
                     result.success = false;
