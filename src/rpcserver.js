@@ -4,7 +4,8 @@ var cityController = require('./controllers/cityController');
 var userController = require('./controllers/userController');
 var cltController = require('./controllers/clientController');
 var adminController = require('./controllers/adminController');
-var oauth = require('./config/init-auth')
+var oauth = require('./config/init-auth');
+var spaceController = require('./controllers/spaceController')
 
 var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
 //var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
