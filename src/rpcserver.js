@@ -4,13 +4,13 @@ var cityController = require('./controllers/cityController');
 var userController = require('./controllers/userController');
 var cltController = require('./controllers/clientController');
 var adminController = require('./controllers/adminController');
-var spaceController = require('./controllers/spaceController');
 var oauth = require('./config/init-auth')
 
 var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
 //var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
 
 var amqpConn = null;
+var channel = undefined;
 function start() {
     console.log('Start connecting : ' + rabbitHost );;
   amqp.connect(rabbitHost, (err, conn)=>{
@@ -41,6 +41,7 @@ function whenConnected() {
             console.error("[AMQP]", err.message);
             //return setTimeout(start, 1000);
         }
+        channel = ch;
         ch.on("error", function(err) {
         console.error("[AMQP] channel error", err.message);
         //return setTimeout(this.startconnect, 1000);
@@ -52,23 +53,33 @@ function whenConnected() {
         console.log('Client connected.');
         this.channel = ch;
 
-        ch.prefetch(10);
+        ch.prefetch(1);
+        channel = ch;
         console.log('Authentication service broker started!');
       //Token API
-      ch.assertQueue("token", {durable: false}, (err, q)=>{
-          ch.consume(q.queue, function reply(msg) {
-              console.log('Token request recieved')
-              var req = JSON.parse(msg.content.toString('utf8'));
-              if (!req.body.password)
-                req.body.password = req.body.username;
-              if (!req.body.grant_type)
-                req.body.grant_type = "password";
-                oauth.token(req,  {}, {}, (result)=>{
-                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                    ch.ack(msg);
-                });
-          });
-      });
+    ch.assertQueue("token", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            console.log('Token request recieved')
+            var req = JSON.parse(msg.content.toString('utf8'));
+            try{
+            if (!req.body.password)
+            req.body.password = req.body.username;
+            if (!req.body.grant_type)
+            req.body.grant_type = "password";
+            oauth.token(req,  {}, {}, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+            }
+            catch(ex)
+            {
+            console.log(ex);
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            }
+            
+        });
+    });
   
        //Token API
     ch.assertQueue("authenticate", {durable: false}, (err, q)=>{
@@ -299,40 +310,72 @@ function whenConnected() {
     ch.assertQueue("adminregister", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.registeruser(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.registeruser(req, (result)=>{
+                                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                                ch.ack(msg);
+                            });
+              }
+            catch(ex)
+              {
+                console.log(ex);
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+              } 
         });
     });
     ch.assertQueue("adminlogin", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.token(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.token(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
         });
     });
 
     ch.assertQueue("adminupdateprofile", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            console.log(req);
-            adminController.updateprofile(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.updateprofile(req, (result)=>{
+                                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                                ch.ack(msg);
+                            });
+            }
+            catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            }
         });
     });
 
     ch.assertQueue("admingetforgotpasswordtoken", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.getforgotpasswordtoken(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.getforgotpasswordtoken(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
+
         });
     });
 
@@ -341,153 +384,145 @@ function whenConnected() {
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
+            try{
             adminController.changenotification(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
+
         });
     });
     ch.assertQueue("adminresetpassword", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.resetpassword(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.resetpassword(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
+
         });
     });
     ch.assertQueue("adminchangeavatar", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.changeavatar(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.changeavatar(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
+
         });
     });
     ch.assertQueue("getadminuserinfo", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.findbyId(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.findbyId(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
+
         });
     });
     ch.assertQueue("adminconfirmemail", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            console.log(req);
-            adminController.confirmemail(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.confirmemail(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
+
         });
     });
     ch.assertQueue("adminchangepassword", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.changepassword(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
+            try{
+                adminController.changepassword(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
+
         });
     });
     ch.assertQueue("admindeleteaccount", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            adminController.deleteaccount(req, (result)=>{
-                console.log("sending result" , result);
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
-    });
-    ///Spaces management api
-    //AddSpace API
-    ch.assertQueue("addspace", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.addSpace(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
-    });
-    //Remove Space API
-    ch.assertQueue("removespace", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.deleteSpace(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
-    });
-    //Update Space API
-    ch.assertQueue("updatespace", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.updateSpace(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
-    });
-    //Get Space By Id API
-    ch.assertQueue("getspacebyid", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.findbyid(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
-    });
-    //Get Space By User Id API
-    ch.assertQueue("getspacebyuserid", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.findByUserId(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
-    });
-    //Set Space Locales
-    ch.assertQueue("setspacelocales", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.setLocales(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
-    });
+            try{
+                adminController.deleteaccount(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+          catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
 
-    //Set Space Webhooks
-    ch.assertQueue("setspacewebhooks", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            spaceController.setWebhooks(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
         });
     });
-    //Set Space Webhooks
-    ch.assertQueue("getspacewebhooks", {durable: false}, (err, q)=>{
-        ch.consume(q.queue, function reply(msg) {
-            var req = JSON.parse(msg.content.toString('utf8'));
-            console.log(req);
-            spaceController.getWebhooks(req, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-        });
+  
+
+    //Exchanges
+    var exchange = 'adminauth';
+
+    channel.assertExchange(exchange, 'direct', {
+      durable: false
     });
-    });
+});
   };
 start();
 // initialize database
 db();
+
+exports.publish = function(exchange, queue, message)
+{
+    channel.publish(exchange, queue, {body : Buffer.from(JSON.stringify(message))});
+    console.log('publishing message to : ' + exchange + " : " + queue);
+}

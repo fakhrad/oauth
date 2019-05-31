@@ -5,6 +5,7 @@ var jwt = require('jsonwebtoken');
 var async = require('async');
 const config = require('../config/config');
 var mongoose = require('mongoose'); 
+var signupevent = require('../events/onAdminUserRegistered');
 
 var findById = function(req, cb)
 {
@@ -149,7 +150,6 @@ var findByUserName = function(req, cb)
         }
     });
 };
-
 var registerUser = function(req, cb)
 {
     var user = new User({
@@ -175,25 +175,12 @@ var registerUser = function(req, cb)
         }
         //Successfull. 
         //Publish user registered event
+        signupevent.onAdminUserRegistered().call(user);
         user.password = undefined;
         result.success = true;
         result.error = undefined;
         result.data =  user;
-        ///Create user first app
-        var space = {};
-        space.name = "Your Space Name";
-        space.owner = result.data._id;
-        space.type = result.data.account_type;
-        spaceCtrl.addSpace({body : space}, (spres)=>{
-            if (!spres.success)
-            {
-                User.findOneAndDelete({username : user.username}, ()=>{
-                    cb(spres);       
-                    return; 
-                })
-            }
-            cb(result); 
-        });
+        cb(result);
     });
 };
 
