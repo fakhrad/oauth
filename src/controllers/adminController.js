@@ -30,8 +30,8 @@ var findById = function(req, cb)
                     result.error = undefined;
                     var output = results.user.viewModel();
                     output.spaces = [];
-                    console.log(spaces);
-                    if (result.spaces)
+                    console.log(results.spaces);
+                    if (results.spaces)
                     {
                         results.spaces.forEach(space => {
                             output.spaces.push(space.viewModel());
