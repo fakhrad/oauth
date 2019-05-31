@@ -523,6 +523,7 @@ db();
 
 exports.publish = function(exchange, queue, message)
 {
-    channel.publish(exchange, queue, {body : message});
+    console.log(message);
+    channel.publish(exchange, queue, Buffer.from(JSON.stringify({body : message})));
     console.log('publishing message to : ' + exchange + " : " + queue);
 }
