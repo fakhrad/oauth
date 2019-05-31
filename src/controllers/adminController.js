@@ -3,6 +3,7 @@ var jwt = require('jsonwebtoken');
 var async = require('async');
 const config = require('../config/config');
 var mongoose = require('mongoose'); 
+var Space = require('../models/space');
 var signupevent = require('../events/onAdminUserRegistered');
 
 var findById = function(req, cb)
