@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 const bcrypt = require('bcrypt-nodejs');
 const SALT_WORK_FACTOR = 10;
-var Spaces = require('./space');
 
 var user = new Schema({
     username : {type:String, required : true, unique : true},
@@ -36,10 +35,6 @@ user.pre('save', function(next) {
     });
 });
 
-user.post('delete', function(next) {
-    console.log('Removing Space');
-    Spaces.deleteOne({owner : this.id}).exec();
-});
 
 user.methods.comparePassword = function(candidatePassword, cb) {
     bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {

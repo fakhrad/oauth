@@ -1,6 +1,5 @@
 var User = require('../models/adminuser'); 
 var Space = require('../models/space'); 
-var spaceCtrl = require('./spaceController');
 var jwt = require('jsonwebtoken');
 var async = require('async');
 const config = require('../config/config');
