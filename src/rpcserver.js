@@ -524,7 +524,7 @@ function whenConnected() {
           ch.consume(q.queue, function(msg) {
             // console.log(msg);
             var req = JSON.parse(msg.content.toString('utf8'));
-            console.log("New space created. adding to local database");
+            console.log("New space created. adding to local database",);
             spaceController.createuserspace(req, (result)=> {});
             try
             {
