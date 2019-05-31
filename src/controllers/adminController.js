@@ -1,5 +1,4 @@
 var User = require('../models/adminuser'); 
-var Space = require('../models/space'); 
 var jwt = require('jsonwebtoken');
 var async = require('async');
 const config = require('../config/config');
@@ -11,7 +10,7 @@ var findById = function(req, cb)
     async.parallel(
         {
             "user" : function(callback) {User.findById(req.body.id).exec(callback)},
-            "spaces" : function(callback) {Space.find({owner : req.body.id}).exec(callback)}
+            //"spaces" : function(callback) {Space.find({owner : req.body.id}).exec(callback)}
         }, (err, results)=>{
             var result = {success : false, data : null, error : null };
             if (err)
@@ -30,9 +29,12 @@ var findById = function(req, cb)
                     result.error = undefined;
                     var output = results.user.viewModel();
                     output.spaces = [];
-                    results.spaces.forEach(space => {
-                        output.spaces.push(space.viewModel());
-                    });
+                    if (result.spaces)
+                    {
+                        results.spaces.forEach(space => {
+                            output.spaces.push(space.viewModel());
+                        });
+                    }
                     result.data = output;
                     cb(result);
                     return;
