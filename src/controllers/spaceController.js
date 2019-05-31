@@ -340,7 +340,12 @@ var createUserSpace = function(req, cb)
     ///Create user first app
     console.log("Create space for user");
     var space = req.body;
+    console.log(space);
     Space.insertMany([space], (err, docs)=>{
+        if (err)
+        {
+            console.log(err);
+        }
         if (cb)
         {
             var result = {success : false, data : null, error : null };
