@@ -515,6 +515,28 @@ function whenConnected() {
     channel.assertExchange(exchange, 'direct', {
       durable: false
     });
+
+    ch.assertQueue("spacecreated", {durable: false}, (err, q)=>{
+        if (!err)
+        {
+          ch.bindQueue(q.queue, "contentservice", "spacecreated")
+          ch.consume(q.queue, function(msg) {
+            // console.log(msg);
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log("New space created. adding to local database");
+            spaceController.createuserspace(req, (result)=> {});
+            try
+            {
+            }
+            catch(ex)
+            {
+
+            }
+          }, {
+            noAck: true
+          });
+        }
+      });
 });
   };
 start();

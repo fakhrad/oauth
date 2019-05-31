@@ -10,7 +10,7 @@ var findById = function(req, cb)
     async.parallel(
         {
             "user" : function(callback) {User.findById(req.body.id).exec(callback)},
-            //"spaces" : function(callback) {Space.find({owner : req.body.id}).exec(callback)}
+            "spaces" : function(callback) {Space.find({owner : req.body.id}).exec(callback)}
         }, (err, results)=>{
             var result = {success : false, data : null, error : null };
             if (err)
