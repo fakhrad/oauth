@@ -525,20 +525,20 @@ function whenConnected() {
             // console.log(msg);
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log("New space created. adding to local database",);
-            spaceController.createuserspace(req, (result)=> {});
             try
             {
+                spaceController.createuserspace(req, (result)=> {});
             }
             catch(ex)
             {
-
+                console.log(ex);
             }
           }, {
             noAck: true
           });
         }
       });
-});
+    });
   };
 start();
 // initialize database

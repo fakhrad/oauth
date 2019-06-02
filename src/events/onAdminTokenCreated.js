@@ -1,5 +1,5 @@
 var broker = require('../rpcserver');
-function onAdminUserRegistered(){
+function onAdminTokenCreated(){
     var _onOkCallBack
     function _onOk (result) {
         if (_onOkCallBack) {
@@ -8,8 +8,8 @@ function onAdminUserRegistered(){
     }
     
     function _call(user) {
-        console.log('adminuserregistered event triggered.')
-        broker.publish("adminauth", "adminuserregistered", user);
+        console.log('admintokencreated event triggered.')
+        broker.publish("adminauth", "admintokencreated", user);
         _onOk(user);
     }
     return {
@@ -21,5 +21,5 @@ function onAdminUserRegistered(){
     }
 }
 
-exports.onAdminUserRegistered = onAdminUserRegistered;
+exports.onAdminTokenCreated = onAdminTokenCreated;
 

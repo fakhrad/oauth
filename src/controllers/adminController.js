@@ -5,6 +5,8 @@ const config = require('../config/config');
 var mongoose = require('mongoose'); 
 var Space = require('../models/space');
 var signupevent = require('../events/onAdminUserRegistered');
+var tokencreatedevent = require('../events/onAdminTokenCreated');
+var userloggedout = require('../events/onAdminUserLoggedout');
 
 var findById = function(req, cb)
 {
@@ -94,6 +96,7 @@ var token = function(req, cb)
                             cb(result);  
                             return;
                         }
+                        tokencreatedevent.onAdminTokenCreated().call({userId : user._id, token : token});
                         //Successfull. 
                         result.success = true;
                         result.error = undefined;
@@ -123,6 +126,46 @@ var token = function(req, cb)
     });
 };
 
+var logout = function(req, cb)
+{
+     User.findById(req.body.id).exec(function(err, user){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (user)
+        {
+            user.access_token = undefined;
+            user.save(function(err){
+                if(err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                //Successfull. 
+                //Publish user logged out event
+                userloggedout.onAdminUserLoggedout().call({userId : user._id, datetime : new Date()})
+            });
+            return;
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result);       
+            return; 
+        }
+    });
+};
 var findByUserName = function(req, cb)
 {
     console.log(req.body.username);
@@ -611,3 +654,4 @@ exports.getforgotpasswordtoken = getforgotpasswordtoken;
 exports.changepassword = changepassword;
 exports.resetpassword = resetpassword;
 exports.confirmemail = confirmEmail;
+exports.logout = logout;
