@@ -222,7 +222,7 @@ var registerUser = function(req, cb)
         //Successfull. 
         //Publish user registered event
         user.password = undefined;
-        signupevent.onAdminUserRegistered().call(user.integrationModel());
+        signupevent.onAdminUserRegistered().call(user);
         result.success = true;
         result.error = undefined;
         result.data =  user;
