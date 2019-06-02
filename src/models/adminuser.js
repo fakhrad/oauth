@@ -60,6 +60,19 @@ user.methods.viewModel = function(cb) {
     }
 };
 
+user.methods.integrationModel = function(cb) {
+    return {
+        id : this._id,
+        username : this.username,
+        roles : this.roles,
+        emailConfirmed : this.emailConfirmed,
+        lastlogin : this.lastlogin,
+        active : this.active,
+        account_type : this.account_type,
+        access_token : this.access_token,
+        profile : this.profile
+    }
+};
 user.methods.confirmEmail = function(cb) {
     this.emailConfirmed = true;
     this.save((err)=>{

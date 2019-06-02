@@ -96,7 +96,7 @@ var token = function(req, cb)
                             cb(result);  
                             return;
                         }
-                        tokencreatedevent.onAdminTokenCreated().call({userId : user._id, token : token});
+                        tokencreatedevent.onAdminTokenCreated().call(user.integrationModel());
                         //Successfull. 
                         result.success = true;
                         result.error = undefined;
@@ -152,7 +152,7 @@ var logout = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user logged out event
-                userloggedout.onAdminUserLoggedout().call({userId : user._id, datetime : new Date()})
+                userloggedout.onAdminUserLoggedout().call(user.integrationModel());
             });
             return;
         }
@@ -221,7 +221,7 @@ var registerUser = function(req, cb)
         }
         //Successfull. 
         //Publish user registered event
-        signupevent.onAdminUserRegistered().call(user);
+        signupevent.onAdminUserRegistered().call(user.integrationModel());
         user.password = undefined;
         result.success = true;
         result.error = undefined;
