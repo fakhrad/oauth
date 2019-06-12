@@ -166,100 +166,6 @@ var changeUserCity = function(req, cb)
     });
 };
 
-var token = function(req, cb)
-{
-    var result = {success : false, data : null, error : null, access_token : null };
-    auth.getClient(req.body.client_id, req.body.client_secret).exec(function(err, cl){
-        if (!cl)
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = "Invalid client";
-            cb(result);       
-            return; 
-        }
-        if (cl)
-        {
-            User.findOne({ username: req.body.username, password: req.body.password }).exec(function(err, user){
-                if (err)
-                {
-                    result.success = false;
-                    result.data =  undefined;
-                    result.error = "Invalid username or password.";
-                    cb(result);       
-                    return; 
-                }
-                if (user)
-                {
-                    user.comparePassword(req.body.password, (err, isMatch)=>{
-                        if (isMatch)
-                        {
-                            var token = auth.generateAccessToken(cl, user);
-                            auth.saveToken(token, cl, user).then(()=>{
-                                if (req.body.deviceToken)
-                                {
-                                    user.device = req.body.deviceToken ? req.body.deviceToken : null;
-                                }
-                                if (user.twoFactorEnabled)
-                                {
-                                    code = getNewCode(req.body.phoneNumber);
-                                    user.activation_code = code;
-                                }
-                                user.lastlogin = new Date();
-                                user.save(function(err){
-                                    if(err)
-                                    {
-                                        result.success = false;
-                                        result.data =  undefined;
-                                        result.error = err;
-                                        cb(result);  
-                                        return;
-                                    }
-                                    //Successfull. 
-                                    //Publish user login request event
-                                    //console.log('new code ' + code)
-                                    result.success = true;
-                                    result.error = undefined;
-                                    user.access_token = token;
-                                    result.data =  user;
-                                    result.access_token = token;
-                                    cb(result); 
-                                });
-                            }).catch({
-                                
-                            });
-
-                        }
-                        else
-                        {
-                            result.success = false;
-                            result.data =  undefined;
-                            result.error = "Invalid password provided";
-                            cb(result);  
-                            return;
-                        }
-                    });
-                }
-                else
-                {
-                    result.success = false;
-                    result.data =  undefined;
-                    result.error = undefined;
-                    cb(result); 
-                }
-            });
-        }
-        else
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = "Client not found";
-            cb(result); 
-        }
-
-    });
-};
-
 var findByPhoneNumber = function(req, cb)
 {
     console.log(req.body.phoneNumber);
@@ -710,7 +616,6 @@ var deleteaccount = function(req, cb)
 };
 
 //Export functions
-exports.token = token;
 exports.findbyphone = findByPhoneNumber;
 exports.registeruser = registerUser;
 exports.changecity = changeUserCity;

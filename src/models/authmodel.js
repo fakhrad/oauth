@@ -34,7 +34,10 @@ module.exports.getAccessToken = function(bearerToken) {
 module.exports.getClient = function(clientId, clientSecret) {
   console.log('Get client started : ' + clientId)
 
-  return OAuthClientsModel.findOne({ clientId: clientId, clientSecret: clientSecret }).lean();
+  if (clientSecret)
+    return OAuthClientsModel.findOne({ clientId: clientId, clientSecret: clientSecret }).lean();
+  else
+    return OAuthClientsModel.findOne({ clientId: clientId }).lean();
 };
 
 /**
@@ -67,16 +70,25 @@ module.exports.getUser = async function(clientId, username, password) {
 module.exports.generateAccessToken = function(client, user, scope)
 {
   var token;
-  if (user.twoFactorEnabled && !user.activation_code)
+  if(user)
   {
-      token = jwt.sign({ clientId : client._id, id: user._id, authenticated : false }, config.secret, {
-      expiresIn: process.env.AUTHENTICATIONCODE_EXPIRE_TIME || 300 // expires in 5 minutes
-    });
+    if (user.twoFactorEnabled && !user.activation_code)
+    {
+        token = jwt.sign({ clientId : client._id, id: user._id, authenticated : false }, config.secret, {
+        expiresIn: process.env.AUTHENTICATIONCODE_EXPIRE_TIME || 300 // expires in 5 minutes
+      });
+    }
+    else
+    {
+      token = jwt.sign({ clientId : client._id, id: user._id, roles :ser.roles, scope : scope, authenticated : true }, config.secret, {
+        expiresIn: process.env.TOKEN_EXPIRE_TIME || 86400// expires in 24 hours
+      });
+    }
   }
   else
   {
-    token = jwt.sign({ clientId : client._id, id: user._id, roles : user.roles, scope : scope, authenticated : true }, config.secret, {
-      expiresIn: process.env.TOKEN_EXPIRE_TIME || 86400 // expires in 24 hours
+    token = jwt.sign({ clientId : client._id, scope : scope, authenticated : true }, config.secret, {
+      expiresIn: process.env.TOKEN_EXPIRE_TIME || 86400 * 30// expires in 24 hours
     });
   }
   return token;
@@ -96,8 +108,8 @@ module.exports.saveToken = function(token, client, user) {
     refreshToken: token.refreshToken,
     accessTokenExpiresOn: token.refreshTokenExpiresAt,
     user : user,
-    userId: user._id,
-    twoFactorEnabled : user.twoFactorEnabled
+    userId: user ? user._id : undefined,
+    twoFactorEnabled : user ? user.twoFactorEnabled : false
   });
   if (token.activation_code)
   {
@@ -141,8 +153,8 @@ module.exports.saveAuthorizationCode = function(){
     refreshToken: token.refreshToken,
     refreshTokenExpiresOn: token.refreshTokenExpiresOn,
     user : user,
-    userId: user._id,
-    twoFactorEnabled : user.twoFactorEnabled
+    userId: user ? user._id : undefined,
+    twoFactorEnabled : user ? user.twoFactorEnabled : false
   });
   if (user.twoFactorEnabled)
   {

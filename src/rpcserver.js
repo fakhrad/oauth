@@ -5,7 +5,8 @@ var userController = require('./controllers/userController');
 var cltController = require('./controllers/clientController');
 var adminController = require('./controllers/adminController');
 var oauth = require('./config/init-auth');
-var spaceController = require('./controllers/spaceController')
+var spaceController = require('./controllers/spaceController');
+var tokenController = require('./controllers/tokenCpntroller');
 
 var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
 //var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
@@ -63,21 +64,24 @@ function whenConnected() {
             console.log('Token request recieved')
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
-            if (!req.body.password)
-            req.body.password = req.body.username;
-            if (!req.body.grant_type)
-            req.body.grant_type = "password";
-            oauth.token(req,  {}, {}, (result)=>{
-                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            });
-            }
-            catch(ex)
-            {
-            console.log(ex);
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
-                ch.ack(msg);
-            }
+                if (!req.body.grant_type)
+                    req.body.grant_type = "password";
+                if (grant_type == "password")
+                {
+                if (!req.body.password)
+                req.body.password = req.body.username;
+                }
+                oauth.token(req,  {}, {}, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+                }
+                catch(ex)
+                {
+                console.log(ex);
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                }
             
         });
     });
@@ -513,7 +517,7 @@ function whenConnected() {
     //Exchanges
     var exchange = 'adminauth';
 
-    channel.assertExchange(exchange, 'direct', {
+    channel.assertExchange(exchange, 'fanout', {
       durable: false
     });
 
