@@ -520,6 +520,9 @@ function whenConnected() {
       durable: false
     });
 
+    channel.assertExchange("contentservice", 'fanout', {
+        durable: false
+    });
     ch.assertQueue("spacecreated", {durable: false}, (err, q)=>{
         if (!err)
         {
