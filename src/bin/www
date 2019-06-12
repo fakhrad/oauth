@@ -9,11 +9,7 @@ var http = require('http');
 /**
  * Get port from environment and store in Express.
  */
-function run()
-{
-  console.log('working...')
-}
-setInterval(run, 1000);
+
 var port = normalizePort(process.env.PORT || '8043');
 //app.set('port', port);
 //app.start();
