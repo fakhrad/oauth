@@ -58,7 +58,7 @@ function whenConnected() {
         channel = ch;
         console.log('Authentication service broker started!');
       //Token API
-    ch.assertQueue("token", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("token", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             console.log('Token request recieved')
             var req = JSON.parse(msg.content.toString('utf8'));
@@ -86,7 +86,7 @@ function whenConnected() {
     });
   
        //Token API
-    ch.assertQueue("authenticate", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("authenticate", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             console.log('Authenticate request recieved')
             var req = JSON.parse(msg.content.toString('utf8'));
@@ -98,7 +98,7 @@ function whenConnected() {
         });
     });
      //Token API
-     ch.assertQueue("authorize", {durable: false, exclusive : true}, (err, q)=>{
+     ch.assertQueue("authorize", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             console.log('Authorize request recieved')
             var req = JSON.parse(msg.content.toString('utf8'));
@@ -110,7 +110,7 @@ function whenConnected() {
         });
     });
     ///AddUser Api
-    ch.assertQueue("register", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("register", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             console.log('register user started')
             var req = JSON.parse(msg.content.toString('utf8'));
@@ -125,7 +125,7 @@ function whenConnected() {
         });
     });
       ///Is Valid Login Api
-      ch.assertQueue("verifycode", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("verifycode", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.verifycode(req, (result)=>{
@@ -136,7 +136,7 @@ function whenConnected() {
       });
   
       ///FindById Api
-      ch.assertQueue("findbyid", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("findbyid", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.findById(req, (result)=>{
@@ -146,7 +146,7 @@ function whenConnected() {
           });
       });
      ///FindByPhone Api
-     ch.assertQueue("findbyphone", {durable: false, exclusive : true}, (err, q)=>{
+     ch.assertQueue("findbyphone", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.findbyphone(req, (result)=>{
@@ -156,7 +156,7 @@ function whenConnected() {
           });
       });
       ///ChangeCity Api
-      ch.assertQueue("changecity", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("changecity", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.changecity(req, (result)=>{
@@ -166,7 +166,7 @@ function whenConnected() {
           });
       });
       ///RequestCode Api
-      ch.assertQueue("requestcode", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("requestcode", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.requestcode(req, (result)=>{
@@ -176,7 +176,7 @@ function whenConnected() {
           });
       });
       ///ChangeNumber API
-      ch.assertQueue("changenumber", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("changenumber", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.changenumber(req, (result)=>{
@@ -186,7 +186,7 @@ function whenConnected() {
           }); 
       });
       ///ChangeAvatar Api
-      ch.assertQueue("changeavatar", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("changeavatar", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.changeavatar(req, (result)=>{
@@ -196,7 +196,7 @@ function whenConnected() {
           });
       });
       ///ChangeLanguage Api
-      ch.assertQueue("changelanguage", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("changelanguage", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.changelanguage(req, (result)=>{
@@ -206,7 +206,7 @@ function whenConnected() {
           });
       });
       ///ChangeNotification Api
-      ch.assertQueue("changenotification", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("changenotification", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.changenotification(req, (result)=>{
@@ -216,7 +216,7 @@ function whenConnected() {
           });
       });
       ///UpdateProfile Api
-      ch.assertQueue("updateprofile", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("updateprofile", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.updateprofile(req, (result)=>{
@@ -226,7 +226,7 @@ function whenConnected() {
           });
       });
       ///DeleteAccount Api
-      ch.assertQueue("deleteaccount", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("deleteaccount", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.deleteaccount(req, (result)=>{
@@ -236,7 +236,7 @@ function whenConnected() {
           });
       });
       ///LocationChanged Api
-      ch.assertQueue("locationchanged", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("locationchanged", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               userController.locationchanged(req, (result)=>{
@@ -248,7 +248,7 @@ function whenConnected() {
 
       ///Clients management apis
       //RegisterClient API
-      ch.assertQueue("registerapp", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("registerapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
@@ -259,7 +259,7 @@ function whenConnected() {
         });
       });
       //RemoveClient API
-      ch.assertQueue("removeapp", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("removeapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.deleteClient(req, (result)=>{
@@ -269,7 +269,7 @@ function whenConnected() {
         });
       });
       //UpdateClient API
-      ch.assertQueue("updateapp", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("updateapp", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.updateClient(req, (result)=>{
@@ -280,7 +280,7 @@ function whenConnected() {
       });
 
      //GetAllClients API
-      ch.assertQueue("getapps", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getapps", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
@@ -291,7 +291,7 @@ function whenConnected() {
         });
       });
       //GetAllClients API
-      ch.assertQueue("getappbyid", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getappbyid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cltController.findbyid(req, (result)=>{
@@ -302,7 +302,7 @@ function whenConnected() {
       });
 
       ///GetCities Api
-      ch.assertQueue("getcities", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getcities", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             cityController.getcities(req, (result)=>{
@@ -311,7 +311,7 @@ function whenConnected() {
             });
         });
     });
-    ch.assertQueue("adminregister", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("adminregister", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -328,7 +328,7 @@ function whenConnected() {
               } 
         });
     });
-    ch.assertQueue("adminlogin", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("adminlogin", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -346,7 +346,7 @@ function whenConnected() {
         });
     });
 
-    ch.assertQueue("adminupdateprofile", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("adminupdateprofile", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -364,7 +364,7 @@ function whenConnected() {
         });
     });
 
-    ch.assertQueue("admingetforgotpasswordtoken", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("admingetforgotpasswordtoken", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -384,7 +384,7 @@ function whenConnected() {
     });
 
     ///ChangeNotification Api
-    ch.assertQueue("adminchangenotification", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("adminchangenotification", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log(req);
@@ -403,7 +403,7 @@ function whenConnected() {
 
         });
     });
-    ch.assertQueue("adminresetpassword", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("adminresetpassword", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -421,7 +421,7 @@ function whenConnected() {
 
         });
     });
-    ch.assertQueue("adminchangeavatar", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("adminchangeavatar", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -439,7 +439,7 @@ function whenConnected() {
 
         });
     });
-    ch.assertQueue("getadminuserinfo", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("getadminuserinfo", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -457,7 +457,7 @@ function whenConnected() {
 
         });
     });
-    ch.assertQueue("adminconfirmemail", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("adminconfirmemail", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -475,7 +475,7 @@ function whenConnected() {
 
         });
     });
-    ch.assertQueue("adminchangepassword", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("adminchangepassword", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -493,7 +493,7 @@ function whenConnected() {
 
         });
     });
-    ch.assertQueue("admindeleteaccount", {durable: false, exclusive : true}, (err, q)=>{
+    ch.assertQueue("admindeleteaccount", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
