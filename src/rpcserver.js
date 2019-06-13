@@ -516,14 +516,14 @@ function whenConnected() {
     //Exchanges
     var exchange = 'adminauth';
 
-    channel.assertExchange(exchange, 'fanout', {
+    ch.assertExchange(exchange, 'fanout', {
       durable: false
     });
 
-    channel.assertExchange("contentservice", 'fanout', {
+    ch.assertExchange("contentservice", 'fanout', {
         durable: false
     });
-    ch.assertQueue("spacecreated", {durable: false}, (err, q)=>{
+    ch.assertQueue("createspaceforauth", {durable: false}, (err, q)=>{
         if (!err)
         {
           ch.bindQueue(q.queue, "contentservice", "spacecreated")
