@@ -19,7 +19,7 @@ function getNewCode(phoneNumber)
 var requestCode = function(req, cb)
 {
     async.parallel({
-        "owner" : function(callback) {User.findOne({phoneNumber : req.body.phoneNumber}).exec(callback)}
+        "owner" : function(callback) {User.findOne({clientId : req.clientId, phoneNumber : req.body.phoneNumber}).exec(callback)}
     }, function(err, results){
         var result = {success : false, data : null, error : null };
         if (err)
@@ -169,7 +169,7 @@ var changeUserCity = function(req, cb)
 var findByPhoneNumber = function(req, cb)
 {
     console.log(req.body.phoneNumber);
-    User.findOne({'phoneNumber' : req.body.phoneNumber}).exec(function(err, user){
+    User.findOne({clientId : req.clientId, 'phoneNumber' : req.body.phoneNumber}).exec(function(err, user){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -208,7 +208,7 @@ function getNewCode(phoneNumber)
 var registerUser = function(req, cb)
 {
     var sh = new User({
-        clientId : req.body.clientId,
+        clientId : req.clientId,
         username : req.body.username,
         password : req.body.password,
         email : req.body.email,
