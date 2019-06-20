@@ -152,7 +152,7 @@ var logout = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user logged out event
-                userloggedout.onAdminUserLoggedout().call(user.integrationModel());
+                userloggedout.onAdminUserLoggedout().call(user);
             });
             return;
         }
