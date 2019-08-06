@@ -65,7 +65,7 @@ function whenConnected() {
             try{
                 if (!req.body.grant_type)
                     req.body.grant_type = "password";
-                if (grant_type == "password")
+                if (req.body.grant_type == "password")
                 {
                 if (!req.body.password)
                 req.body.password = req.body.username;
