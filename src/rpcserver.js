@@ -115,9 +115,9 @@ function whenConnected() {
             console.log('register user started')
             var req = JSON.parse(msg.content.toString('utf8'));
             if (!req.username)
-                req.username = req.phoneNumber;
+                req.username = req.body.phoneNumber;
             if (!req.password)
-                req.password = req.phoneNumber;
+                req.password = req.body.phoneNumber;
             userController.registeruser(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
