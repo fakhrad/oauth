@@ -63,12 +63,14 @@ function whenConnected() {
             console.log('Token request recieved')
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
+                if (!req.body.username)
+                    req.body.username = req.body.phoneNumber;
                 if (!req.body.grant_type)
                     req.body.grant_type = "password";
                 if (req.body.grant_type == "password")
                 {
-                if (!req.body.password)
-                req.body.password = req.body.username;
+                    if (!req.body.password)
+                        req.body.password = req.body.username;
                 }
                 oauth.token(req,  {}, {}, (result)=>{
                     ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );

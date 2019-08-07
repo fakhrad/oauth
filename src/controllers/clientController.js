@@ -2,6 +2,7 @@ const Clients = require('../models/client');
 var uuid = require('uuid/v4')
 const bcrypt = require('bcrypt-nodejs');
 const SALT_WORK_FACTOR = 10;
+var appadded = require('../events/OnClientAppRegistered');
 
 var findByUSpaceId = function(req, cb)
 {
@@ -105,7 +106,9 @@ var addClient = function(req, cb)
                     return; 
                 }
                 //Successfull. 
-                //Publish user registered event
+                //Publish app registered event
+                appadded.OnClientAppRegistered().call(client);
+
                 result.success = true;
                 result.error = undefined;
                 result.data =  client;
