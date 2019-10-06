@@ -36,7 +36,7 @@ var findById = function(req, cb)
                     if (results.spaces)
                     {
                         results.spaces.forEach(space => {
-                            output.spaces.push(space);
+                            output.spaces.push(space.viewModel());
                         });
                     }
                     result.data = output;

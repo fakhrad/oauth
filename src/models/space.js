@@ -14,7 +14,7 @@ const space = new Schema({
   image: { type: Object },
   type: { type: String },
   notification_email: { type: String },
-  owner: { type: Schema.Types.ObjectId, ref: "Systemuser", required: true },
+  owner: { type: Schema.Types.ObjectId, ref: "AdminUsers", required: true },
   roles: [],
   locales: [],
   webhooks: []
@@ -25,7 +25,10 @@ space.methods.viewModel = function(cb) {
     id: this._id,
     roles: this.roles,
     locales: this.locales,
-    name: this.name
+    name: this.name,
+    description : this.description,
+    webhooks : this.webhooks,
+    notification_email : this.notification_email
   };
 };
 module.exports = mongoose.model("Space", space);
