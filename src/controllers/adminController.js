@@ -36,7 +36,7 @@ var findById = function(req, cb)
                     if (results.spaces)
                     {
                         results.spaces.forEach(space => {
-                            output.spaces.push(space.viewModel());
+                            output.spaces.push(space);
                         });
                     }
                     result.data = output;
@@ -230,6 +230,72 @@ var registerUser = function(req, cb)
     });
 };
 
+var addUser = function(req, cb)
+{
+    var user = new User({
+        username : req.body.username,
+        password : req.body.password,
+        account_type : req.body.account_type,
+        roles : req.body.roles,
+        profile : {
+            first_name : req.body.first_name ? req.body.first_name : null,
+            last_name : req.body.last_name ? req.body.last_name : null,
+            avatar : req.body.avatar ? req.body.avatar : null,
+        }
+    });
+    user.save(function(err){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        //Successfull. 
+        //Add to space users
+        if (req.spaceId)
+        {
+            Space.findById(req.spaceId).exec((err, space)=>{
+                if (err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                space.users = space.users || [];
+                space.users.push(user._id);
+                space.save(function(err){
+                    if(err)
+                    {
+                        result.success = false;
+                        result.data =  undefined;
+                        result.error = err;
+                        cb(result);       
+                        return; 
+                    }
+                    //Successfull. 
+                    user.password = undefined;
+                    result.success = true;
+                    result.error = undefined;
+                    result.data =  user;
+                    cb(result);
+                });
+        });
+    }
+        else
+        {
+            user.password = undefined;
+            result.success = true;
+            result.error = undefined;
+            result.data =  user;
+            cb(result);
+        }
+    });
+};
 var changeAvatar = function(req, cb)
 {
      User.findById(req.body.id).exec(function(err, user){
@@ -645,6 +711,7 @@ var changepassword = function(req, cb)
 exports.token = token;
 exports.findbyemail = findByUserName;
 exports.registeruser = registerUser;
+exports.adduser = addUser;
 exports.changeavatar = changeAvatar;
 exports.changenotification = changeNotification;
 exports.findbyId = findById;
