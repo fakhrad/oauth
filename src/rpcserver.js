@@ -349,6 +349,25 @@ function whenConnected() {
         });
     });
 
+    //Set Space Locales
+    ch.assertQueue("setspacelocales", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            try{
+                spaceController.setLocales(req, (result)=>{
+                    ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+                });
+            }
+            catch(ex)
+            {
+                console.log(ex);
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                    ch.ack(msg);
+            } 
+
+        });
+    });
     //Set Space Roles
     ch.assertQueue("setspaceroles", {durable: false}, (err, q)=>{
     ch.consume(q.queue, function reply(msg) {
