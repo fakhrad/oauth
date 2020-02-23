@@ -4,106 +4,111 @@ const bcrypt = require('bcrypt-nodejs');
 const SALT_WORK_FACTOR = 10;
 var appadded = require('../events/OnClientAppRegistered');
 
-var findByUSpaceId = function(req, cb)
-{
+var findByUSpaceId = function (req, cb) {
     console.log(req);
-    Clients.find({"spaceId" : req.spaceId}).exec(function(err, clients){
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
+    Clients.find({
+        "spaceId": req.spaceId
+    }).exec(function (err, clients) {
+        var result = {
+            success: false,
+            data: null,
+            error: null
+        };
+        if (err) {
             result.success = false;
-            result.data =  undefined;
+            result.data = undefined;
             result.error = err;
-            cb(result);       
-            return; 
+            cb(result);
+            return;
         }
-        if (clients)
-        {
+        if (clients) {
             result.success = true;
             result.error = undefined;
-            result.data =  clients;
-            cb(result); 
-        }
-        else
-        {
+            result.data = clients;
+            cb(result);
+        } else {
             result.success = false;
-            result.data =  undefined;
+            result.data = undefined;
             result.error = undefined;
-            cb(result); 
+            cb(result);
         }
     });
 };
-var findById = function(req, cb)
-{
-    Clients.find({"id" : req.body.id}).exec(function(err, client){
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
+var findById = function (req, cb) {
+    Clients.find({
+        "id": req.body.id
+    }).exec(function (err, client) {
+        var result = {
+            success: false,
+            data: null,
+            error: null
+        };
+        if (err) {
             result.success = false;
-            result.data =  undefined;
+            result.data = undefined;
             result.error = err;
-            cb(result);       
-            return; 
+            cb(result);
+            return;
         }
-        if (client)
-        {
-            if (client.owner !== req.userId)
-            {
+        if (client) {
+            if (client.owner !== req.userId) {
                 result.success = false;
-                result.data =  {"message" : "Invalid access"};
+                result.data = {
+                    "message": "Invalid access"
+                };
                 result.error = undefined;
-                cb(result);       
-                return; 
+                cb(result);
+                return;
             }
             result.success = true;
             result.error = undefined;
-            result.data =  client;
-            cb(result); 
-        }
-        else
-        {
+            result.data = client;
+            cb(result);
+        } else {
             result.success = false;
-            result.data =  undefined;
+            result.data = undefined;
             result.error = undefined;
-            cb(result); 
+            cb(result);
         }
     });
 };
-var addClient = function(req, cb)
-{
+var addClient = function (req, cb) {
     var client = new Clients({
-        spaceId : req.spaceId,
+        spaceId: req.spaceId,
         redirectUris: req.body.redirectUris,
-        name : req.body.name,
-        description : req.body.description,
-        longDesc : req.body.longDesc,
-        icon : req.body.icon,
-        homepage : req.body.homepage,
-        category : req.body.category,
-        type : req.body.type,
-        owner : req.userId,
-        grants : req.body.grants
+        name: req.body.name,
+        description: req.body.description,
+        longDesc: req.body.longDesc,
+        icon: req.body.icon,
+        homepage: req.body.homepage,
+        category: req.body.category,
+        type: req.body.type,
+        owner: req.userId,
+        grants: req.body.grants
     });
 
     client.clientId = uuid();
     // only hash the password if it has been modified (or is new)
     // generate a salt
-    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+    bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
         if (err) return;
 
         // hash the password using our new salt
-        bcrypt.hash(client.clientId, salt, function(){}, function(err, hash) {
-            if (err) return ;
+        bcrypt.hash(client.clientId, salt, function () {}, function (err, hash) {
+            if (err) return;
             client.clientSecret = hash;
-            client.save(function(err){
-                var result = {success : false, data : null, error : null };
-                if (err)
-                {
+            client.save(function (err) {
+                var result = {
+                    success: false,
+                    data: null,
+                    error: null
+                };
+                if (err) {
                     result.success = false;
-                    result.data =  undefined;
+                    result.data = undefined;
                     result.error = err;
-                    cb(result);       
-                    return; 
+                    cb(result);
+                    return;
                 }
                 //Successfull. 
                 //Publish app registered event
@@ -111,137 +116,165 @@ var addClient = function(req, cb)
 
                 result.success = true;
                 result.error = undefined;
-                result.data =  client;
-                cb(result); 
+                result.data = client;
+                cb(result);
             });
         });
     });
 };
 
-var deleteClient = function(req, cb)
-{
-     Clients.findById(req.body.id).exec(function(err, client){
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
+var deleteClient = function (req, cb) {
+    Clients.findById(req.body.id).exec(function (err, client) {
+        var result = {
+            success: false,
+            data: null,
+            error: null
+        };
+        if (err) {
             result.success = false;
-            result.data =  undefined;
+            result.data = undefined;
             result.error = err;
-            cb(result);       
-            return; 
+            cb(result);
+            return;
         }
-        if (client)
-        {
-            if (client.owner !== req.userId)
-            {
+        if (client) {
+            if (client.owner !== req.userId) {
                 result.success = false;
-                result.data =  {"message" : "Invalid access"};
+                result.data = {
+                    "message": "Invalid access"
+                };
                 result.error = undefined;
-                cb(result);       
-                return; 
+                cb(result);
+                return;
             }
-            Clients.remove({_id : client._id}, function(err){
-                if(err)
-                {
+            Clients.remove({
+                _id: client._id
+            }, function (err) {
+                if (err) {
                     result.success = false;
-                    result.data =  undefined;
+                    result.data = undefined;
                     result.error = err;
-                    cb(result);       
-                    return; 
+                    cb(result);
+                    return;
                 }
                 //Successfull. 
                 //Publish user account deleted event
                 result.success = true;
-                result.data =  {"message" : "Deleted successfully"};
+                result.data = {
+                    "message": "Deleted successfully"
+                };
                 result.error = undefined;
-                cb(result);       
-                return; 
+                cb(result);
+                return;
             });
             return;
-        }
-        else
-        {
+        } else {
             result.success = false;
-            result.data =  undefined;
+            result.data = undefined;
             result.error = undefined;
-            cb(result);       
-            return; 
+            cb(result);
+            return;
         }
     });
 };
 
-var updateClient = function(req, cb)
-{
-     Clients.findById(req.body.id).exec(function(err, client){
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
+var updateClient = function (req, cb) {
+    Clients.findById(req.body.id).exec(function (err, client) {
+        var result = {
+            success: false,
+            data: null,
+            error: null
+        };
+        if (err) {
             result.success = false;
-            result.data =  undefined;
+            result.data = undefined;
             result.error = err;
-            cb(result);       
-            return; 
+            cb(result);
+            return;
         }
-        if (client)
-        {
-            if (client.owner !== req.userId)
-            {
+        if (client) {
+            if (client.owner !== req.userId) {
                 result.success = false;
-                result.data =  {"message" : "Invalid access"};
+                result.data = {
+                    "message": "Invalid access"
+                };
                 result.error = undefined;
-                cb(result);       
-                return; 
+                cb(result);
+                return;
             }
             client.redirectUris = req.body.redirectUris,
-            client.name = req.body.name,
-            client.description = req.body.description,
-            client.longDesc = req.body.longDesc,
-            client.icon = req.body.icon,
-            client.homepage = req.body.homepage,
-            client.category = req.body.category,
-            client.type = req.body.type,
-            client.grants = req.body.grants;
-            client.save(function(err){
-                if(err)
-                {
+                client.name = req.body.name,
+                client.description = req.body.description,
+                client.longDesc = req.body.longDesc,
+                client.icon = req.body.icon,
+                client.homepage = req.body.homepage,
+                client.category = req.body.category,
+                client.type = req.body.type,
+                client.grants = req.body.grants;
+            client.save(function (err) {
+                if (err) {
                     result.success = false;
-                    result.data =  undefined;
+                    result.data = undefined;
                     result.error = err;
-                    cb(result);       
-                    return; 
+                    cb(result);
+                    return;
                 }
                 //Successfull. 
                 //Publish user profile updated event
-                Clients.findById(req.body.id).exec(function(err, client){
-                    if(err)
-                    {
+                Clients.findById(req.body.id).exec(function (err, client) {
+                    if (err) {
                         result.success = false;
-                        result.data =  undefined;
+                        result.data = undefined;
                         result.error = err;
-                        cb(result);       
-                        return; 
+                        cb(result);
+                        return;
                     }
                     result.success = true;
                     result.error = undefined;
-                    result.data =  client;
-                    cb(result); 
+                    result.data = client;
+                    cb(result);
                 });
             });
             return;
-        }
-        else
-        {
+        } else {
             result.success = false;
-            result.data =  undefined;
+            result.data = undefined;
             result.error = undefined;
-            cb(result);       
-            return; 
+            cb(result);
+            return;
         }
     });
 };
 
+var countAll = function (req, cb) {
+    Clients.where({
+            "spaceId": req.spaceId
+        })
+        .countDocuments(function (err, contentTypes) {
+            var result = {
+                success: false,
+                data: null,
+                error: null
+            };
+            if (err) {
+                result.success = false;
+                result.data = undefined;
+                result.error = err;
+                cb(result);
+                return;
+            }
+            result.success = true;
+            result.error = undefined;
+            result.data = {
+                count: contentTypes,
+                limits: 100
+            };
+            cb(result);
+        });
+};
 exports.findBySpaceId = findByUSpaceId;
 exports.addClient = addClient;
 exports.deleteClient = deleteClient;
 exports.updateClient = updateClient;
 exports.findbyid = findById;
+exports.count = countAll;
