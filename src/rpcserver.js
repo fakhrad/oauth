@@ -6,6 +6,7 @@ var cltController = require("./controllers/clientController");
 var adminController = require("./controllers/adminController");
 var oauth = require("./config/init-auth");
 var spaceController = require("./controllers/spaceController");
+const uuidv4 = require('uuid/v4');
 
 var rabbitHost =
   process.env.RABBITMQ_HOST ||
@@ -847,6 +848,36 @@ function whenConnected() {
       }
     );
 
+    ch.assertQueue(
+      "adminverifycode", {
+        durable: false
+      },
+      (err, q) => {
+        ch.consume(q.queue, function reply(msg) {
+          var req = JSON.parse(msg.content.toString("utf8"));
+          try {
+            adminController.verifyCode(req, result => {
+              ch.sendToQueue(
+                msg.properties.replyTo,
+                new Buffer.from(JSON.stringify(result)), {
+                  correlationId: msg.properties.correlationId
+                }
+              );
+              ch.ack(msg);
+            });
+          } catch (ex) {
+            console.log(ex);
+            ch.sendToQueue(
+              msg.properties.replyTo,
+              new Buffer.from(JSON.stringify(ex)), {
+                correlationId: msg.properties.correlationId
+              }
+            );
+            ch.ack(msg);
+          }
+        });
+      }
+    );
     ///ChangeNotification Api
     ch.assertQueue("adminchangenotification", {
       durable: false
@@ -1046,6 +1077,9 @@ function whenConnected() {
       durable: false
     });
 
+    ch.assertExchange("messaging", "direct", {
+      durable: false
+    });
     ch.assertExchange("contentservice", "direct", {
       durable: false
     });
