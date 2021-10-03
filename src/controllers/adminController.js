@@ -62,10 +62,10 @@ var findById = function (req, cb) {
 var generateToken = function (client, authenticated, expireTime, scope) {
     var token;
     token = jwt.sign({
-            clientId: client,
-            scope: scope,
-            authenticated: authenticated
-        },
+        clientId: client,
+        scope: scope,
+        authenticated: authenticated
+    },
         config.secret, {
             expiresIn: expireTime
         }
@@ -105,8 +105,8 @@ var token = function (req, cb) {
                         id: user._id,
                         account_type: user.account_type
                     }, config.secret, {
-                        expiresIn: process.env.AUTHENTICATIONTOKEN_EXPIRE_TIME || 30 * 24 * 60 * 60 // expires in 5 minutes
-                    });
+                            expiresIn: process.env.AUTHENTICATIONTOKEN_EXPIRE_TIME || 30 * 24 * 60 * 60 // expires in 5 minutes
+                        });
                     user.lastlogin = new Date();
                     user.access_token = token;
                     user.save(function (err) {
@@ -240,7 +240,7 @@ var registerUser = function (req, cb) {
         //Successfull. 
         //Publish user registered event
         user.password = undefined;
-        user.access_token = generateToken(user._id, true, 5 * 60 * 60, "verify");
+        //user.saveToken(generateToken(user._id, true, 5 * 60 * 60, "verify"));
         signupevent.onAdminUserRegistered().call(user);
         result.success = true;
         result.error = undefined;
@@ -599,8 +599,8 @@ var getforgotpasswordtoken = function (req, cb) {
                 // `saveResult` is mongoose wrapper object, not doc itself. Calling `toJSON()` returns the doc.
                 saveResult =
                     saveResult && typeof saveResult == "object" ?
-                    saveResult.toJSON() :
-                    saveResult;
+                        saveResult.toJSON() :
+                        saveResult;
                 console.log(saveResult);
                 //Send activation code to user phone
                 // sendVerifyCode(
